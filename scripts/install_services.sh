@@ -20,7 +20,7 @@ install_depends() {
   apt install -qqy caddy ftpd sqlite3 php-sqlite3 alsa-utils \
     pulseaudio avahi-utils sox libsox-fmt-mp3 php php-fpm php-curl php-xml \
     php-zip icecast2 swig ffmpeg wget unzip curl cmake make bc libjpeg-dev \
-    zlib1g-dev python3-dev python3-pip python3-venv lsof net-tools
+    zlib1g-dev python3-dev python3-pip python3-venv lsof net-tools gcc python3-dev
 }
 
 
@@ -43,15 +43,12 @@ install_birdnet_analysis() {
   cat << EOF > $HOME/BirdNET-Pi/templates/birdnet_analysis.service
 [Unit]
 Description=BirdNET Analysis
-After=birdnet_server.service
-Requires=birdnet_server.service
 [Service]
-RuntimeMaxSec=900
 Restart=always
 Type=simple
 RestartSec=2
 User=${USER}
-ExecStart=/usr/local/bin/birdnet_analysis.sh
+ExecStart=$PYTHON_VIRTUAL_ENV /usr/local/bin/birdnet_analysis.py
 [Install]
 WantedBy=multi-user.target
 EOF

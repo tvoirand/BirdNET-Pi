@@ -55,10 +55,30 @@ ensure_python_package() {
 }
 
 # update snippets below
+if ! which inotifywait &>/dev/null;then
+  ensure_apt_updated
+  apt-get -y install inotify-tools
+fi
+if ! which gcc &>/dev/null;then
+  ensure_apt_updated
+  apt-get -y install gcc python3-dev
+fi
+
+ensure_python_package inotify inotify
+
 if ! grep 'daemon' $HOME/BirdNET-Pi/templates/chart_viewer.service &>/dev/null;then
   sed -i "s|daily_plot.py.*|daily_plot.py --daemon --sleep 2|" ~/BirdNET-Pi/templates/chart_viewer.service
   systemctl daemon-reload && restart_services.sh
 fi
+
+if grep -q 'birdnet_server.service' "$HOME/BirdNET-Pi/templates/birdnet_analysis.service"&>/dev/null; then
+    sed -i '/After=.*/d' "$HOME/BirdNET-Pi/templates/birdnet_analysis.service"
+    sed -i '/Requires=.*/d' "$HOME/BirdNET-Pi/templates/birdnet_analysis.service"
+    sed -i '/RuntimeMaxSec=.*/d' "$HOME/BirdNET-Pi/templates/birdnet_analysis.service"
+    sed -i "s|ExecStart=.*|ExecStart=$HOME/BirdNET-Pi/birdnet/bin/python3 /usr/local/bin/birdnet_analysis.py|" "$HOME/BirdNET-Pi/templates/birdnet_analysis.service"
+    systemctl daemon-reload && restart_services.sh
+fi
+
 # update snippets above
 
 systemctl daemon-reload
