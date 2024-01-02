@@ -55,7 +55,10 @@ ensure_python_package() {
 }
 
 # update snippets below
-
+if ! grep 'daemon' $HOME/BirdNET-Pi/templates/chart_viewer.service &>/dev/null;then
+  sed -i "s|daily_plot.py.*|daily_plot.py --daemon --sleep 2|" ~/BirdNET-Pi/templates/chart_viewer.service
+  systemctl daemon-reload && restart_services.sh
+fi
 # update snippets above
 
 systemctl daemon-reload
