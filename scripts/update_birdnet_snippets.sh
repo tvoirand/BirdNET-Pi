@@ -66,6 +66,11 @@ fi
 
 ensure_python_package inotify inotify
 
+if ! which inotifywait &>/dev/null;then
+  ensure_apt_updated
+  apt-get -y install inotify-tools
+fi
+
 remove_unit_file birdnet_server.service /usr/local/bin/server.py
 remove_unit_file extraction.service /usr/local/bin/extract_new_birdsounds.sh
 
