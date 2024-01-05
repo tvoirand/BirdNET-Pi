@@ -1,4 +1,5 @@
 import datetime
+import logging
 import math
 import operator
 import os
@@ -17,6 +18,9 @@ try:
 except BaseException:
     from tensorflow import lite as tflite
 
+log = logging.getLogger(__name__)
+
+
 userDir = os.path.expanduser('~')
 INTERPRETER, INCLUDE_LIST, EXCLUDE_LIST = (None, None, None)
 PREDICTED_SPECIES_LIST = []
@@ -32,7 +36,7 @@ def loadModel():
     global MDATA_INPUT_INDEX
     global CLASSES
 
-    print('LOADING TF LITE MODEL...', end=' ')
+    log.info('LOADING TF LITE MODEL...')
 
     # Load TFLite model and allocate tensors.
     # model will either be BirdNET_GLOBAL_6K_V2.4_Model_FP16 (new) or BirdNET_6K_GLOBAL_MODEL (old)
@@ -57,7 +61,7 @@ def loadModel():
         for line in lfile.readlines():
             CLASSES.append(line.replace('\n', ''))
 
-    print('DONE!')
+    log.info('LOADING DONE!')
 
     return myinterpreter
 
@@ -80,7 +84,7 @@ def loadMetaModel():
     M_INPUT_LAYER_INDEX = input_details[0]['index']
     M_OUTPUT_LAYER_INDEX = output_details[0]['index']
 
-    print("loaded META model")
+    log.info("loaded META model")
 
 
 def predictFilter(lat, lon, week):
@@ -166,7 +170,7 @@ def splitSignal(sig, rate, overlap, seconds=3.0, minlen=1.5):
 
 def readAudioData(path, overlap, sample_rate=48000):
 
-    print('READING AUDIO DATA...', end=' ', flush=True)
+    log.info('READING AUDIO DATA...')
 
     # Open file with librosa (uses ffmpeg or libav)
     sig, rate = librosa.load(path, sr=sample_rate, mono=True, res_type='kaiser_fast')
@@ -174,7 +178,7 @@ def readAudioData(path, overlap, sample_rate=48000):
     # Split audio into 3-second chunks
     chunks = splitSignal(sig, rate, overlap)
 
-    print('DONE! READ', str(len(chunks)), 'CHUNKS.')
+    log.info('READING DONE! READ %d CHUNKS.', len(chunks))
 
     return chunks
 
@@ -219,8 +223,8 @@ def predict(sample, sensitivity):
     # Sort by score
     p_sorted = sorted(p_labels.items(), key=operator.itemgetter(1), reverse=True)
 
-#     # print("DATABASE SIZE:", len(p_sorted))
-#     # print("HUMAN-CUTOFF AT:", int(len(p_sorted)*priv_thresh)/10)
+    log.debug("DATABASE SIZE: %d", len(p_sorted))
+    log.debug("HUMAN-CUTOFF AT: %d", int(len(p_sorted)*priv_thresh)/10)
 #
 #     # Remove species that are on blacklist
 
@@ -241,7 +245,7 @@ def analyzeAudioData(chunks, lat, lon, week, sens, overlap,):
 
     detections = {}
     start = time.time()
-    print('ANALYZING AUDIO...', end=' ', flush=True)
+    log.info('ANALYZING AUDIO...')
 
     if model == "BirdNET_GLOBAL_6K_V2.4_Model_FP16":
         if len(PREDICTED_SPECIES_LIST) == 0 or len(INCLUDE_LIST) != 0:
@@ -277,7 +281,7 @@ def analyzeAudioData(chunks, lat, lon, week, sens, overlap,):
 
         pred_start = pred_end - overlap
 
-    print(f'DONE! Time {time.time() - start:.2f} SECONDS')
+    log.info('DONE! Time %.2f SECONDS', time.time() - start)
     return detections
 
 
@@ -313,7 +317,7 @@ def run_analysis(file):
     try:
         audio_data = readAudioData(file.file_name, conf.getfloat('OVERLAP'))
     except (NameError, TypeError) as e:
-        print(f"Error with the following info: {e}")
+        log.error("Error with the following info: %s", e)
         return []
 
     # Process audio data and get detections
@@ -321,7 +325,7 @@ def run_analysis(file):
                                       conf.getfloat('SENSITIVITY'), conf.getfloat('OVERLAP'))
     confident_detections = []
     for time_slot, entries in raw_detections.items():
-        print(f'{time_slot}-{entries[0]}')
+        log.info('%s-%s', time_slot, entries[0])
         for entry in entries:
             if entry[1] >= conf.getfloat('CONFIDENCE') and ((entry[0] in INCLUDE_LIST or len(INCLUDE_LIST) == 0)
                                                             and (entry[0] not in EXCLUDE_LIST or len(EXCLUDE_LIST) == 0)
