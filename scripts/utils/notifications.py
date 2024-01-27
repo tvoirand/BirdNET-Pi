@@ -4,6 +4,7 @@ import socket
 import sqlite3
 from datetime import datetime
 import requests
+import html
 import time as timeim
 
 userDir = os.path.expanduser('~')
@@ -46,8 +47,8 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
     # print(settings_dict)
     if os.path.exists(APPRISE_CONFIG) and os.path.getsize(APPRISE_CONFIG) > 0:
 
-        title = settings_dict.get('APPRISE_NOTIFICATION_TITLE')
-        body = settings_dict.get('APPRISE_NOTIFICATION_BODY')
+        title = html.unescape(settings_dict.get('APPRISE_NOTIFICATION_TITLE'))
+        body = html.unescape(settings_dict.get('APPRISE_NOTIFICATION_BODY'))
         sciName, comName = species.split("_")
 
         APPRISE_ONLY_NOTIFY_SPECIES_NAMES = settings_dict.get('APPRISE_ONLY_NOTIFY_SPECIES_NAMES')
