@@ -55,6 +55,10 @@ ensure_python_package() {
 }
 
 # update snippets below
+SRC="APPRISE_NOTIFICATION_BODY='(.*)'$"
+DST='APPRISE_NOTIFICATION_BODY="\1"'
+sed -i -E "s/$SRC/$DST/" /etc/birdnet/birdnet.conf
+
 if ! which inotifywait &>/dev/null;then
   ensure_apt_updated
   apt-get -y install inotify-tools
