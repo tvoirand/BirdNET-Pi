@@ -14,6 +14,18 @@ from sklearn.preprocessing import normalize
 from suntime import Sun
 from datetime import datetime
 
+profile = False
+if profile:
+    try:
+        from pyinstrument import Profiler
+    except ImportError as e:
+        print(e)
+        profile = False
+    else:
+        profiler = Profiler()
+        profiler.start()
+
+
 pio.templates.default = "plotly_white"
 
 userDir = os.path.expanduser('~')
@@ -539,3 +551,7 @@ else:
 # audio_file = open('/home/*/BirdSongs/Extracted/By_Date/2022-03-22/Yellow-streaked_Greenbul/Yellow-streaked_Greenbul-77-2022-03-22-birdnet-15:04:28.mp3', 'rb')
 # audio_bytes = audio_file.read()
 # cols4.audio(audio_bytes, format='audio/mp3')
+if profile:
+    profiler.stop()
+    profiler.print()
+    print('**profiler done**', flush=True)
