@@ -57,15 +57,13 @@ def get_connection(path: str):
     return sqlite3.connect(path, check_same_thread=False)
 
 
-@st.cache_resource()
 def get_data(_conn: Connection):
     df1 = pd.read_sql("SELECT * FROM detections", con=conn)
     return df1
 
 
 conn = get_connection(URI_SQLITE_DB)
-df = get_data(conn)
-df2 = df.copy()
+df2 = get_data(conn)
 df2['DateTime'] = pd.to_datetime(df2['Date'] + " " + df2['Time'])
 df2 = df2.set_index('DateTime')
 
@@ -184,8 +182,8 @@ font_size = 15
 
 
 def sunrise_sunset_scatter(num_days_to_display):
-    latitude = df['Lat'][0]
-    longitude = df['Lon'][0]
+    latitude = df2['Lat'][0]
+    longitude = df2['Lon'][0]
 
     sun = Sun(latitude, longitude)
 
