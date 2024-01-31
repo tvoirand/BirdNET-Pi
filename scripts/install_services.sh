@@ -99,6 +99,9 @@ set_login() {
   if ! [ -d /etc/lightdm ];then
     systemctl set-default multi-user.target
     ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+    if ! [ -d /etc/systemd/system/getty@tty1.service.d ];then
+      mkdir /etc/systemd/system/getty@tty1.service.d
+    fi
     cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << EOF
 [Service]
 ExecStart=
