@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 # Update BirdNET-Pi
 trap 'exit 1' SIGINT SIGHUP
 USER=$(awk -F: '/1000/ {print $1}' /etc/passwd)
@@ -20,9 +21,7 @@ PIP_UPDATED=0
 
 # helpers
 sudo_with_user () {
-  set -x
   sudo -u $USER "$@"
-  set +x
 }
 
 ensure_apt_updated () {
