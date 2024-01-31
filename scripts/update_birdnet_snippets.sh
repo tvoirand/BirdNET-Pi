@@ -66,6 +66,9 @@ fi
 
 ensure_python_package inotify inotify
 
+remove_unit_file birdnet_server.service /usr/local/bin/server.py
+remove_unit_file extraction.service /usr/local/bin/extract_new_birdsounds.sh
+
 if ! grep 'daemon' $HOME/BirdNET-Pi/templates/chart_viewer.service &>/dev/null;then
   sed -i "s|daily_plot.py.*|daily_plot.py --daemon --sleep 2|" ~/BirdNET-Pi/templates/chart_viewer.service
   systemctl daemon-reload && restart_services.sh
@@ -77,6 +80,13 @@ if grep -q 'birdnet_server.service' "$HOME/BirdNET-Pi/templates/birdnet_analysis
     sed -i '/RuntimeMaxSec=.*/d' "$HOME/BirdNET-Pi/templates/birdnet_analysis.service"
     sed -i "s|ExecStart=.*|ExecStart=$HOME/BirdNET-Pi/birdnet/bin/python3 /usr/local/bin/birdnet_analysis.py|" "$HOME/BirdNET-Pi/templates/birdnet_analysis.service"
     systemctl daemon-reload && restart_services.sh
+fi
+
+if [ -L /usr/local/bin/analyze.py ];then
+  rm -f /usr/local/bin/analyze.py
+fi
+if [ -L /usr/local/bin/birdnet_analysis.sh ];then
+  rm -f /usr/local/bin/birdnet_analysis.sh
 fi
 
 # update snippets above

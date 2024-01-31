@@ -56,41 +56,6 @@ EOF
   systemctl enable birdnet_analysis.service
 }
 
-install_birdnet_server() {
-  cat << EOF > $HOME/BirdNET-Pi/templates/birdnet_server.service
-[Unit]
-Description=BirdNET Analysis Server
-Before=birdnet_analysis.service
-[Service]
-Restart=always
-Type=simple
-RestartSec=10
-User=${USER}
-ExecStart=$PYTHON_VIRTUAL_ENV /usr/local/bin/server.py
-[Install]
-WantedBy=multi-user.target
-EOF
-  ln -sf $HOME/BirdNET-Pi/templates/birdnet_server.service /usr/lib/systemd/system
-  systemctl enable birdnet_server.service
-}
-
-install_extraction_service() {
-  cat << EOF > $HOME/BirdNET-Pi/templates/extraction.service
-[Unit]
-Description=BirdNET BirdSound Extraction
-[Service]
-Restart=on-failure
-RestartSec=3
-Type=simple
-User=${USER}
-ExecStart=/usr/bin/env bash -c 'while true;do extract_new_birdsounds.sh;sleep 3;done'
-[Install]
-WantedBy=multi-user.target
-EOF
-  ln -sf $HOME/BirdNET-Pi/templates/extraction.service /usr/lib/systemd/system
-  systemctl enable extraction.service
-}
-
 create_necessary_dirs() {
   echo "Creating necessary directories"
   [ -d ${EXTRACTED} ] || sudo -u ${USER} mkdir -p ${EXTRACTED}
@@ -434,11 +399,9 @@ install_services() {
   install_Caddyfile
   install_avahi_aliases
   install_birdnet_analysis
-  install_birdnet_server
   install_birdnet_stats_service
   install_recording_service
   install_custom_recording_service # But does not enable
-  install_extraction_service
   install_spectrogram_service
   install_chart_viewer_service
   install_gotty_logs
