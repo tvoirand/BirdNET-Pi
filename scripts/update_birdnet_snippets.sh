@@ -5,6 +5,7 @@ trap 'exit 1' SIGINT SIGHUP
 USER=$(awk -F: '/1000/ {print $1}' /etc/passwd)
 HOME=$(awk -F: '/1000/ {print $6}' /etc/passwd)
 my_dir=$HOME/BirdNET-Pi/scripts
+source "$my_dir/install_helpers.sh"
 
 # Sets proper permissions and ownership
 find $HOME/Bird* -type f ! -perm -g+wr -exec chmod g+wr {} + 2>/dev/null
@@ -69,6 +70,12 @@ fi
 
 apprise_version=$($HOME/BirdNET-Pi/birdnet/bin/python3 -c "import apprise; print(apprise.__version__)")
 [[ $apprise_version != "1.7.1" ]] && sudo_with_user $HOME/BirdNET-Pi/birdnet/bin/pip3 install apprise==1.7.1
+
+tf_version=$($HOME/BirdNET-Pi/birdnet/bin/python3 -c "import tflite_runtime; print(tflite_runtime.__version__)")
+if [ "$tf_version" != "2.11.0" ]; then
+  get_tf_whl
+  sudo_with_user $HOME/BirdNET-Pi/birdnet/bin/pip3 install $HOME/BirdNET-Pi/$WHL numpy==1.23.5
+fi
 
 ensure_python_package inotify inotify
 
