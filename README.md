@@ -12,6 +12,9 @@ A realtime acoustic bird classification system for the Raspberry Pi 4B, 400, 3B+
 <p align="center">
 Icon made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
 </p>
+<p>
+!! note: see 'Migrating' on how to migrate from mcguirepr89
+</p>
 
 ## Introduction
 BirdNET-Pi is built on the [BirdNET framework](https://github.com/kahst/BirdNET-Analyzer) by [**@kahst**](https://github.com/kahst) <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg"></a> using [pre-built TFLite binaries](https://github.com/PINTO0309/TensorflowLite-bin) by [**@PINTO0309**](https://github.com/PINTO0309) . It is able to recognize bird sounds from a USB microphone or sound card in realtime and share its data with the rest of the world.
@@ -122,7 +125,13 @@ Use the web interface and go to "Tools" > "System Controls" > "Update." If you e
 ```
 /usr/local/bin/uninstall.sh && cd ~ && rm -drf BirdNET-Pi
 ```
-
+## Migrating
+Run these commands to migrate to this repo
+```
+git remote remove origin
+git remote add origin https://github.com/Nachtzuster/BirdNET-Pi.git
+./scripts/update_birdnet.sh
+```
 ## Troubleshooting and Ideas
 *Hint: A lot of weird problems can be solved by simply restarting the core services. Do this from the web interface "Tools" > "Services" > "Restart Core Services"
 Having trouble or have an idea? *Submit an issue for trouble* and a *discussion for ideas*. Please do *not* submit an issue as a discussion -- the issue tracker solicits information that is needed for anyone to help -- discussions are *not for issues*.
