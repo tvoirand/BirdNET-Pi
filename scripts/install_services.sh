@@ -183,7 +183,7 @@ http:// ${BIRDNETPI_URL} {
     birdnet ${HASHWORD}
   }
   reverse_proxy /stream localhost:8000
-  php_fastcgi unix//run/php/php7.4-fpm.sock
+  php_fastcgi unix//run/php/php-fpm.sock
   reverse_proxy /log* localhost:8080
   reverse_proxy /stats* localhost:8501
   reverse_proxy /terminal* localhost:8888
@@ -201,7 +201,7 @@ http:// ${BIRDNETPI_URL} {
     file_server browse
   }
   reverse_proxy /stream localhost:8000
-  php_fastcgi unix//run/php/php7.4-fpm.sock
+  php_fastcgi unix//run/php/php-fpm.sock
   reverse_proxy /log* localhost:8080
   reverse_proxy /stats* localhost:8501
   reverse_proxy /terminal* localhost:8888
@@ -324,7 +324,7 @@ EOF
 configure_caddy_php() {
   echo "Configuring PHP for Caddy"
   sed -i 's/www-data/caddy/g' /etc/php/*/fpm/pool.d/www.conf
-  systemctl restart php7\*-fpm.service
+  systemctl restart php\*-fpm.service
   echo "Adding Caddy sudoers rule"
   cat << EOF > /etc/sudoers.d/010_caddy-nopasswd
 caddy ALL=(ALL) NOPASSWD: ALL
