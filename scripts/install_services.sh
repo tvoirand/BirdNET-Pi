@@ -212,6 +212,7 @@ EOF
   systemctl enable caddy
   usermod -aG $USER caddy
   usermod -aG video caddy
+  chmod g+x $HOME
 }
 
 install_avahi_aliases() {
