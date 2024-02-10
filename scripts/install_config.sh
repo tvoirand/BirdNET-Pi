@@ -246,6 +246,9 @@ CUSTOM_IMAGE_TITLE=""
 LAST_RUN=
 THIS_RUN=
 IDFILE=$HOME/BirdNET-Pi/IdentifiedSoFar.txt
+LogLevel_BirdnetRecordingService="error"
+LogLevel_LiveAudioStreamService="error"
+LogLevel_SpectrogramViewerService="error"
 EOF
 }
 

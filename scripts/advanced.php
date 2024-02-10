@@ -28,6 +28,7 @@ if (!isset($_SERVER['PHP_AUTH_USER'])) {
 if(isset($_GET['submit'])) {
   $contents = file_get_contents('/etc/birdnet/birdnet.conf');
   $contents2 = file_get_contents('./scripts/thisrun.txt');
+  $restart_livestream = False;
 
   if(isset($_GET["caddy_pwd"])) {
     $caddy_pwd = $_GET["caddy_pwd"];
@@ -70,12 +71,7 @@ if(isset($_GET['submit'])) {
     if(strcmp($rtsp_stream,$config['RTSP_STREAM']) !== 0) {
       $contents = preg_replace("/RTSP_STREAM=.*/", "RTSP_STREAM=\"$rtsp_stream\"", $contents);
       $contents2 = preg_replace("/RTSP_STREAM=.*/", "RTSP_STREAM=\"$rtsp_stream\"", $contents2);
-      $fh = fopen('/etc/birdnet/birdnet.conf', "w");
-      $fh2 = fopen("./scripts/thisrun.txt", "w");
-      fwrite($fh, $contents);
-      fwrite($fh2, $contents2);
-      exec('sudo systemctl restart birdnet_recording.service');
-      exec('sudo systemctl restart livestream.service');
+      $restart_livestream = True;
     }
   }
 
@@ -86,12 +82,7 @@ if(isset($_GET['submit'])) {
     if (strcmp($rtsp_stream_selected, $config['RTSP_STREAM_TO_LIVESTREAM']) !== 0) {
       $contents = preg_replace("/RTSP_STREAM_TO_LIVESTREAM=.*/", "RTSP_STREAM_TO_LIVESTREAM=\"$rtsp_stream_selected\"", $contents);
       $contents2 = preg_replace("/RTSP_STREAM_TO_LIVESTREAM=.*/", "RTSP_STREAM_TO_LIVESTREAM=\"$rtsp_stream_selected\"", $contents2);
-      $fh = fopen("/etc/birdnet/birdnet.conf", "w");
-      $fh2 = fopen("./scripts/thisrun.txt", "w");
-      fwrite($fh, $contents);
-      fwrite($fh2, $contents2);
-      sleep(1);
-      exec("sudo systemctl restart livestream.service");
+      $restart_livestream = True;
     }
   }
 
@@ -102,15 +93,9 @@ if(isset($_GET['submit'])) {
     if (strcmp($activate_freqshift_in_livestream, $config['ACTIVATE_FREQSHIFT_IN_LIVESTREAM']) !== 0) {
       $contents = preg_replace("/ACTIVATE_FREQSHIFT_IN_LIVESTREAM=.*/", "ACTIVATE_FREQSHIFT_IN_LIVESTREAM=\"$activate_freqshift_in_livestream\"", $contents);
       $contents2 = preg_replace("/ACTIVATE_FREQSHIFT_IN_LIVESTREAM=.*/", "ACTIVATE_FREQSHIFT_IN_LIVESTREAM=\"$activate_freqshift_in_livestream\"", $contents2);
-      $fh = fopen("/etc/birdnet/birdnet.conf", "w");
-      $fh2 = fopen("./scripts/thisrun.txt", "w");
-      fwrite($fh, $contents);
-      fwrite($fh2, $contents2);
-      sleep(1);
-      exec("sudo systemctl restart livestream.service");
+      $restart_livestream = True;
     }
   }
-
   
   if(isset($_GET["overlap"])) {
     $overlap = $_GET["overlap"];
@@ -189,7 +174,6 @@ if(isset($_GET['submit'])) {
     if(strcmp($privacy_threshold,$config['PRIVACY_THRESHOLD']) !== 0) {
       $contents = preg_replace("/PRIVACY_THRESHOLD=.*/", "PRIVACY_THRESHOLD=$privacy_threshold", $contents);
       $contents2 = preg_replace("/PRIVACY_THRESHOLD=.*/", "PRIVACY_THRESHOLD=$privacy_threshold", $contents2);
-      exec('restart_services.sh');
     }
   }
 
@@ -270,106 +254,41 @@ if(isset($_GET['submit'])) {
     }
   }
 
-	if (isset($_GET["LogLevel_BirdnetRecordingService"])) {
-		$birdnet_recording_service_log_level = trim($_GET["LogLevel_BirdnetRecordingService"]);
-
-		//If setting exists change it's value
-		if (array_key_exists('LogLevel_BirdnetRecordingService', $config)) {
-			//Setting exists already, see if the value changed
-			if (strcmp($birdnet_recording_service_log_level, $config['LogLevel_BirdnetRecordingService']) !== 0) {
-				$contents = preg_replace("/LogLevel_BirdnetRecordingService=.*/", "LogLevel_BirdnetRecordingService=\"$birdnet_recording_service_log_level\"", $contents);
-				$contents2 = preg_replace("/LogLevel_BirdnetRecordingService=.*/", "LogLevel_BirdnetRecordingService=\"$birdnet_recording_service_log_level\"", $contents2);
-				$fh = fopen("/etc/birdnet/birdnet.conf", "w");
-				$fh2 = fopen("./scripts/thisrun.txt", "w");
-				fwrite($fh, $contents);
-				fwrite($fh2, $contents2);
-				sleep(1);
-				exec("sudo systemctl restart birdnet_recording.service");
-			}
-		} else {
-			//Create the setting in the setting file - same as what update_birdnet_snippets.sh does but will take the users selected log level as the value
-			shell_exec('sudo echo "LogLevel_BirdnetRecordingService=\"' . $birdnet_recording_service_log_level . '\"" >> /etc/birdnet/birdnet.conf');
-			//also update this run txt file
-			shell_exec('sudo echo "LogLevel_BirdnetRecordingService=\"' . $birdnet_recording_service_log_level . '\"" >> ./scripts/thisrun.txt');
-
-			//Reload the config files as we've changed the contents, we need to make sure the contents of the existing variables reflects contents of the config file
-			sleep(1);
-			$contents = file_get_contents('/etc/birdnet/birdnet.conf');
-			$contents2 = file_get_contents('./scripts/thisrun.txt');
-
-			exec("sudo systemctl restart birdnet_recording.service");
-		}
+  if (isset($_GET["LogLevel_BirdnetRecordingService"])) {
+    $birdnet_recording_service_log_level = trim($_GET["LogLevel_BirdnetRecordingService"]);
+	if (strcmp($birdnet_recording_service_log_level, $config['LogLevel_BirdnetRecordingService']) !== 0) {
+		$contents = preg_replace("/LogLevel_BirdnetRecordingService=.*/", "LogLevel_BirdnetRecordingService=\"$birdnet_recording_service_log_level\"", $contents);
+		$contents2 = preg_replace("/LogLevel_BirdnetRecordingService=.*/", "LogLevel_BirdnetRecordingService=\"$birdnet_recording_service_log_level\"", $contents2);
 	}
-
-	if (isset($_GET["LogLevel_SpectrogramViewerService"])) {
-		$spectrogram_viewer_service_log_level = trim($_GET["LogLevel_SpectrogramViewerService"]);
-
-		//If setting exists change it's value
-		if (array_key_exists('LogLevel_SpectrogramViewerService', $config)) {
-			//Setting exists already, see if the value changed
-			if (strcmp($spectrogram_viewer_service_log_level, $config['LogLevel_SpectrogramViewerService']) !== 0) {
-				$contents = preg_replace("/LogLevel_SpectrogramViewerService=.*/", "LogLevel_SpectrogramViewerService=\"$spectrogram_viewer_service_log_level\"", $contents);
-				$contents2 = preg_replace("/LogLevel_SpectrogramViewerService=.*/", "LogLevel_SpectrogramViewerService=\"$spectrogram_viewer_service_log_level\"", $contents2);
-				$fh = fopen("/etc/birdnet/birdnet.conf", "w");
-				$fh2 = fopen("./scripts/thisrun.txt", "w");
-				fwrite($fh, $contents);
-				fwrite($fh2, $contents2);
-				sleep(1);
-				exec("sudo systemctl restart spectrogram_viewer.service");
-			}
-		} else {
-			//Create the setting in the setting file - same as what update_birdnet_snippets.sh does but will take the users selected log level as the value
-			shell_exec('sudo echo "LogLevel_SpectrogramViewerService=\"' . $spectrogram_viewer_service_log_level . '\"" >> /etc/birdnet/birdnet.conf');
-			//also update this run txt file
-			shell_exec('sudo echo "LogLevel_SpectrogramViewerService=\"' . $spectrogram_viewer_service_log_level . '\"" >> ./scripts/thisrun.txt');
-
-			//Reload the config files as we've changed the contents, we need to make sure the contents of the existing variables reflects contents of the config file
-			sleep(1);
-			$contents = file_get_contents('/etc/birdnet/birdnet.conf');
-			$contents2 = file_get_contents('./scripts/thisrun.txt');
-
-			exec("sudo systemctl restart spectrogram_viewer.service");
-		}
+  }
+  if (isset($_GET["LogLevel_SpectrogramViewerService"])) {
+    $spectrogram_viewer_service_log_level = trim($_GET["LogLevel_SpectrogramViewerService"]);
+	if (strcmp($birdnet_recording_service_log_level, $config['LogLevel_BirdnetRecordingService']) !== 0) {
+		$contents = preg_replace("/LogLevel_SpectrogramViewerService=.*/", "LogLevel_BirdnetRecordingService=\"$spectrogram_viewer_service_log_level\"", $contents);
+		$contents2 = preg_replace("/LogLevel_SpectrogramViewerService=.*/", "LogLevel_BirdnetRecordingService=\"$spectrogram_viewer_service_log_level\"", $contents2);
 	}
-
-	if (isset($_GET["LogLevel_LiveAudioStreamService"])) {
-		$livestream_audio_service_log_level = trim($_GET["LogLevel_LiveAudioStreamService"]);
-
-		//If setting exists change it's value
-		if (array_key_exists('LogLevel_LiveAudioStreamService', $config)) {
-			//Setting exists already, see if the value changed
-			if (strcmp($livestream_audio_service_log_level, $config['LogLevel_LiveAudioStreamService']) !== 0) {
-				$contents = preg_replace("/LogLevel_LiveAudioStreamService=.*/", "LogLevel_LiveAudioStreamService=\"$livestream_audio_service_log_level\"", $contents);
-				$contents2 = preg_replace("/LogLevel_LiveAudioStreamService=.*/", "LogLevel_LiveAudioStreamService=\"$livestream_audio_service_log_level\"", $contents2);
-				//Write the settings to the config files, so we can restart the relevant services
-				$fh = fopen("/etc/birdnet/birdnet.conf", "w");
-				$fh2 = fopen("./scripts/thisrun.txt", "w");
-				fwrite($fh, $contents);
-				fwrite($fh2, $contents2);
-				sleep(1);
-				exec("sudo systemctl restart livestream.service && sudo systemctl restart icecast2.service");
-			}
-		} else {
-			//Create the setting in the setting file - same as what update_birdnet_snippets.sh does but will take the users selected log level as the value
-			shell_exec('sudo echo "LogLevel_LiveAudioStreamService=\"' . $livestream_audio_service_log_level . '\"" >> /etc/birdnet/birdnet.conf');
-			//also update this run txt file
-			shell_exec('sudo echo "LogLevel_LiveAudioStreamService=\"' . $livestream_audio_service_log_level . '\"" >> ./scripts/thisrun.txt');
-
-			//Reload the config files as we've changed the contents, we need to make sure the contents of the existing variables reflects contents of the config file
-			sleep(1);
-			$contents = file_get_contents('/etc/birdnet/birdnet.conf');
-			$contents2 = file_get_contents('./scripts/thisrun.txt');
-
-			exec("sudo systemctl restart livestream.service && sudo systemctl restart icecast2.service");
-		}
+  }
+  if (isset($_GET["LogLevel_LiveAudioStreamService"])) {
+    $livestream_audio_service_log_level = trim($_GET["LogLevel_LiveAudioStreamService"]);
+	if (strcmp($birdnet_recording_service_log_level, $config['LogLevel_LiveAudioStreamService']) !== 0) {
+		$contents = preg_replace("/LogLevel_LiveAudioStreamService=.*/", "LogLevel_LiveAudioStreamService=\"$livestream_audio_service_log_level\"", $contents);
+		$contents2 = preg_replace("/LogLevel_LiveAudioStreamService=.*/", "LogLevel_LiveAudioStreamService=\"$livestream_audio_service_log_level\"", $contents2);
+		$restart_livestream = True;
 	}
+  }
 
-	//Finally write the data out. some sections do this themselves in order to have the new settings ready for the services that will be restarted
-	//but will doubly ensure the settings are saved after any modification
-	$fh = fopen('/etc/birdnet/birdnet.conf', "w");
-	$fh2 = fopen("./scripts/thisrun.txt", "w");
-	fwrite($fh, $contents);
-	fwrite($fh2, $contents2);
+  //Finally write the data out. some sections do this themselves in order to have the new settings ready for the services that will be restarted
+  //but will doubly ensure the settings are saved after any modification
+  $fh = fopen('/etc/birdnet/birdnet.conf', "w");
+  $fh2 = fopen("./scripts/thisrun.txt", "w");
+  fwrite($fh, $contents);
+  fwrite($fh2, $contents2);
+
+  syslog(LOG_INFO, "Restarting Services");
+  shell_exec("sudo restart_services.sh");
+  if ($restart_livestream) {
+    exec("sudo systemctl restart livestream.service");
+  }
 }
 
 $user = trim(shell_exec("awk -F: '/1000/{print $1}' /etc/passwd"));
