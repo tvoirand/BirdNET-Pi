@@ -16,11 +16,11 @@ next=0
 looptime=$(( RECORDING_LENGTH * 2 / 3 ))
 
 # Continuously loop generating a spectrogram
-inotifywait -m -e close_write "$HOME/BirdNET-Pi/analyzing_now.txt" |
+inotifywait -m -e close_write "$HOME/BirdSongs/StreamData/analyzing_now.txt" |
 while read; do
   now=$(date +%s)
   if (( now > next )); then
-    analyzing_now="$(<$HOME/BirdNET-Pi/analyzing_now.txt)"
+    analyzing_now="$(<$HOME/BirdSongs/StreamData/analyzing_now.txt)"
 
     if [ -n "${analyzing_now}" ] && [ -f "${analyzing_now}" ]; then
       spectrogram_png=${EXTRACTED}/spectrogram.png

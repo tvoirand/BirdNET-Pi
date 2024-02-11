@@ -13,7 +13,7 @@ _settings = None
 
 DB_PATH = os.path.expanduser('~/BirdNET-Pi/scripts/birds.db')
 THISRUN = os.path.expanduser('~/BirdNET-Pi/scripts/thisrun.txt')
-ANALYZING_NOW = os.path.expanduser('~/BirdNET-Pi/analyzing_now.txt')
+ANALYZING_NOW = os.path.expanduser('~/BirdSongs/StreamData/analyzing_now.txt')
 
 
 class PHPConfigParser(ConfigParser):
