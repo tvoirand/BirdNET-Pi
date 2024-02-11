@@ -106,6 +106,12 @@ if grep -q 'birdnet_server.service' "$HOME/BirdNET-Pi/templates/birdnet_analysis
     systemctl daemon-reload && restart_services.sh
 fi
 
+TMP_MOUNT=$(systemd-escape -p --suffix=mount "$RECS_DIR/StreamData")
+if ! [ -f "$HOME/BirdNET-Pi/templates/$TMP_MOUNT" ]; then
+   install_birdnet_mount
+   chown $USER:$USER "$HOME/BirdNET-Pi/templates/$TMP_MOUNT"
+fi
+
 if grep -q 'php7.4-' /etc/caddy/Caddyfile &>/dev/null; then
   sed -i 's/php7.4-/php-/' /etc/caddy/Caddyfile
 fi

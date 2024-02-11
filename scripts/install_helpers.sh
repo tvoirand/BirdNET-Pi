@@ -26,3 +26,22 @@ get_tf_whl () {
     }
   fi
 }
+
+install_birdnet_mount() {
+  TMP_MOUNT=$(systemd-escape -p --suffix=mount "$RECS_DIR/StreamData")
+  cat << EOF > $HOME/BirdNET-Pi/templates/$TMP_MOUNT
+[Unit]
+Description=Birdnet tmpfs for transient files
+ConditionPathExists=$RECS_DIR/StreamData
+
+[Mount]
+What=tmpfs
+Where=$RECS_DIR/StreamData
+Type=tmpfs
+Options=mode=1777,nosuid,nodev
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  ln -sf $HOME/BirdNET-Pi/templates/$TMP_MOUNT /usr/lib/systemd/system
+}

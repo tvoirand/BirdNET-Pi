@@ -6,7 +6,8 @@ my_dir=$HOME/BirdNET-Pi/scripts
 source /etc/birdnet/birdnet.conf &> /dev/null
 SCRIPTS=($(ls -1 ${my_dir}) ${HOME}/.gotty)
 set -x
-services=($(awk '/service/ && /systemctl/ && !/php/ {print $3}' ${my_dir}/install_services.sh | sort) custom_recording.service avahi-alias@.service)
+TMP_MOUNT=$(systemd-escape -p --suffix=mount "$RECS_DIR/StreamData")
+services=($(awk '/service/ && /systemctl/ && !/php/ {print $3}' ${my_dir}/install_services.sh | sort) custom_recording.service avahi-alias@.service $TMP_MOUNT)
 
 remove_services() {
   for i in "${services[@]}"; do

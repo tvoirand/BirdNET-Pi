@@ -413,6 +413,7 @@ install_services() {
   install_gotty_logs
   install_phpsysinfo
   install_livestream_service
+  install_birdnet_mount
   install_cleanup_cron
   install_weekly_cron
   increase_caddy_timeout
@@ -426,6 +427,7 @@ install_services() {
 
 if [ -f ${config_file} ];then
   source ${config_file}
+  source install_helpers.sh
   install_services
   chown_things
 else
