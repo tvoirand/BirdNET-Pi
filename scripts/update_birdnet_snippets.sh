@@ -5,6 +5,7 @@ trap 'exit 1' SIGINT SIGHUP
 USER=$(awk -F: '/1000/ {print $1}' /etc/passwd)
 HOME=$(awk -F: '/1000/ {print $6}' /etc/passwd)
 my_dir=$HOME/BirdNET-Pi/scripts
+source /etc/birdnet/birdnet.conf
 source "$my_dir/install_helpers.sh"
 
 # Sets proper permissions and ownership
@@ -58,6 +59,9 @@ ensure_python_package() {
 SRC="APPRISE_NOTIFICATION_BODY='(.*)'$"
 DST='APPRISE_NOTIFICATION_BODY="\1"'
 sed -i -E "s/$SRC/$DST/" /etc/birdnet/birdnet.conf
+
+[ -d $RECS_DIR/StreamData ] || sudo_with_user mkdir -p $RECS_DIR/StreamData
+[ -L ${EXTRACTED}/spectrogram.png ] || sudo_with_user ln -sf ${RECS_DIR}/StreamData/spectrogram.png ${EXTRACTED}/spectrogram.png
 
 if ! which inotifywait &>/dev/null;then
   ensure_apt_updated
