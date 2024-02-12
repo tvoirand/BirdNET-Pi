@@ -1,9 +1,10 @@
-<?php 
+<?php
+$home = trim(shell_exec("awk -F: '/1000/{print $6}' /etc/passwd"));
+function do_service_mount($action) {
+  echo "value=\"sudo systemctl ".$action." ".service_mount()." && sudo reboot\"";
+}
 function service_status($name) {
-  $user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-  $home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-  $home = trim($home);
-
+  global $home;
   if($name == "birdnet_analysis.service") {
     $filesinproc=trim(shell_exec("ls ".$home."/BirdSongs/StreamData | wc -l"));
     if($filesinproc > 200) { 
@@ -78,6 +79,11 @@ function service_status($name) {
     <button type="submit" name="submit" value="sudo systemctl restart spectrogram_viewer.service">Restart</button>
     <button type="submit" name="submit" value="sudo systemctl disable --now spectrogram_viewer.service">Disable</button>
     <button type="submit" name="submit" value="sudo systemctl enable --now spectrogram_viewer.service">Enable</button>
+  </form>
+  <form action="" method="GET">
+    <h3>Ram drive (!experimental!) <?php echo service_status(service_mount());?></h3>
+    <button type="submit" name="submit" <?php do_service_mount("disable");?> onclick="return confirm('This will reboot, are you sure?')">Disable</button>
+    <button type="submit" name="submit" <?php do_service_mount("enable");?> onclick="return confirm('This will reboot, are you sure?')">Enable</button>
   </form>
   <form action="" method="GET">
     <button type="submit" name="submit" value="stop_core_services.sh">Stop Core Services</button>

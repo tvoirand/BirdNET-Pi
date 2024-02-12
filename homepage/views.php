@@ -29,6 +29,11 @@ $user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
 $user = trim($user);
 $home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
 $home = trim($home);
+function service_mount() {
+  global $home;
+  $service_mount=trim(shell_exec("systemd-escape -p --suffix=mount ".$home."/BirdSongs/StreamData"));
+  return $service_mount;
+}
 if(!isset($_SESSION['behind'])) {
   $fetch = shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi fetch 2>&1");
   $str = trim(shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi status"));
@@ -319,6 +324,8 @@ if(isset($_GET['view'])){
                        'sudo systemctl restart spectrogram_viewer.service',
                        'sudo systemctl disable --now spectrogram_viewer.service',
                        'sudo systemctl enable --now spectrogram_viewer.service',
+                       'sudo systemctl enable '.service_mount().' && sudo reboot',
+                       'sudo systemctl disable '.service_mount().' && sudo reboot',
                        'stop_core_services.sh',
                        'restart_services.sh',
                        'sudo reboot',
