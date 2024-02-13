@@ -56,6 +56,8 @@ sudo_with_user git -C $HOME/BirdNET-Pi switch -C $branch --track $remote/$branch
 # Prints out changes
 sudo_with_user git -C $HOME/BirdNET-Pi diff --stat $commit_hash HEAD
 
+$my_dir/pre_update.sh
+
 sudo systemctl daemon-reload
 sudo ln -sf $my_dir/* /usr/local/bin/
 
