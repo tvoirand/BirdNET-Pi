@@ -30,6 +30,7 @@ install_birdnet() {
   echo "Establishing a python virtual environment"
   python3 -m venv birdnet
   source ./birdnet/bin/activate
+  pip3 install wheel
   get_tf_whl
   pip3 install -U -r ./requirements_custom.txt
 }
