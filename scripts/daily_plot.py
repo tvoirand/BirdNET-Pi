@@ -46,7 +46,7 @@ def create_plot(df_plt_today, now, is_top):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0, hspace=0)
 
     # generate y-axis order for all figures based on frequency
-    freq_order = pd.value_counts(df_plt_selection_today['Com_Name']).index
+    freq_order = df_plt_selection_today['Com_Name'].value_counts().index
 
     # make color for max confidence --> this groups by name and calculates max conf
     confmax = df_plt_selection_today.groupby('Com_Name')['Confidence'].max()
@@ -58,18 +58,19 @@ def create_plot(df_plt_today, now, is_top):
     if is_top:
         # Set Palette for graphics
         pal = "Greens"
-        colors = plt.cm.Greens(norm(confmax))
+        colors = plt.cm.Greens(norm(confmax)).tolist()
         plot_type = "Top"
         name = "Combo"
     else:
         # Set Palette for graphics
         pal = "Reds"
-        colors = plt.cm.Reds(norm(confmax))
+        colors = plt.cm.Reds(norm(confmax)).tolist()
         plot_type = "Bottom"
         name = "Combo2"
 
     # Generate frequency plot
-    plot = sns.countplot(y='Com_Name', data=df_plt_selection_today, palette=colors,  order=freq_order, ax=axs[0])
+    plot = sns.countplot(y='Com_Name', hue='Com_Name', legend=False, data=df_plt_selection_today,
+                         palette=colors, order=freq_order, ax=axs[0])
 
     # Try plot grid lines between bars - problem at the moment plots grid lines on bars - want between bars
     yticklabels = ['\n'.join(textwrap.wrap(ticklabel.get_text(), 15)) for ticklabel in plot.get_yticklabels()]
