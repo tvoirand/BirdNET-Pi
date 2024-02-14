@@ -126,7 +126,7 @@ Use the web interface and go to "Tools" > "System Controls" > "Update." If you e
 /usr/local/bin/uninstall.sh && cd ~ && rm -drf BirdNET-Pi
 ```
 ## Migrating
-Run these commands to migrate to this repo
+Before switching, make sure your installation is fully up to date. Run these commands to migrate to this repo
 ```
 git remote remove origin
 git remote add origin https://github.com/Nachtzuster/BirdNET-Pi.git
