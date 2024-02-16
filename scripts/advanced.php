@@ -326,10 +326,10 @@ if (file_exists('./scripts/thisrun.txt')) {
       // Update the current slider value (each time you drag the slider handle)
       slider.oninput = function() {
         output.innerHTML = this.value;
-        document.getElementById("predictionCount").innerHTML = parseInt((this.value * <?php echo $count; ?>)/100);
+        document.getElementById("predictionCount").innerHTML = parseInt(Math.max(10, (this.value * <?php echo $count; ?>)/100));
       }
       </script>
-      <p>If a Human is predicted anywhere among the top <span id="predictionCount"><?php echo $newconfig['PRIVACY_THRESHOLD'] == 0 ? "threshold % of" : intval(($newconfig['PRIVACY_THRESHOLD'] * $count)/100); ?></span> predictions, the sample will be considered of human origin and no data will be collected. Start with 1% and move up as needed.</p>
+      <p>If a Human is predicted anywhere among the top <span id="predictionCount"><?php echo intval(max(10, ($newconfig['PRIVACY_THRESHOLD'] * $count)/100)); ?></span> predictions, the sample will be considered of human origin and no data will be collected. Start with 1% and move up as needed.</p>
       </td></tr></table><br>
       
       <table class="settingstable"><tr><td>
