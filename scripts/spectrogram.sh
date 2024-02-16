@@ -15,6 +15,7 @@ fi
 next=0
 looptime=$(( RECORDING_LENGTH * 2 / 3 ))
 
+touch "$HOME/BirdSongs/StreamData/analyzing_now.txt"
 # Continuously loop generating a spectrogram
 inotifywait -m -e close_write "$HOME/BirdSongs/StreamData/analyzing_now.txt" |
 while read; do
