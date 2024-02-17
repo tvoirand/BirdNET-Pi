@@ -223,12 +223,10 @@ def predict(sample, sensitivity):
     # Sort by score
     p_sorted = sorted(p_labels.items(), key=operator.itemgetter(1), reverse=True)
 
-    log.debug("DATABASE SIZE: %d", len(p_sorted))
-    log.debug("HUMAN-CUTOFF AT: %d", int(len(p_sorted)*priv_thresh)/10)
-#
-#     # Remove species that are on blacklist
+    human_cutoff = max(10, int(len(p_sorted) * priv_thresh / 100.0))
 
-    human_cutoff = max(10, int(len(p_sorted) * priv_thresh))
+    log.debug("DATABASE SIZE: %d", len(p_sorted))
+    log.debug("HUMAN-CUTOFF AT: %d", human_cutoff)
 
     for i in range(min(10, len(p_sorted))):
         if p_sorted[i][0] == 'Human_Human':
