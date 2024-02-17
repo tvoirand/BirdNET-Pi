@@ -14,6 +14,7 @@ find $HOME/Bird* -not -user $USER -execdir sudo -E chown $USER:$USER {} \+
 chmod 666 ~/BirdNET-Pi/scripts/*.txt
 chmod 666 ~/BirdNET-Pi/*.txt
 find $HOME/BirdNET-Pi -path "$HOME/BirdNET-Pi/birdnet" -prune -o -type f ! -perm /o=w -exec chmod a+w {} \;
+chmod g+r $HOME
 
 # remove world-writable perms
 chmod -R o-w ~/BirdNET-Pi/templates/*
