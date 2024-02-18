@@ -158,7 +158,12 @@ if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true" && isse
           }
 
            // Read the blacklisted image ids from the file into an array
-          $blacklisted_ids = array_map('trim', file($home."/BirdNET-Pi/scripts/blacklisted_images.txt"));
+          $blacklisted_file = file($home."/BirdNET-Pi/scripts/blacklisted_images.txt");
+          if ($blacklisted_file !== false) {
+            $blacklisted_ids = array_map('trim', $blacklisted_file);
+          } else {
+            $blacklisted_ids = [];
+          }
 
           // Make the API call
           $flickrjson = json_decode(file_get_contents("https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=".$config["FLICKR_API_KEY"]."&text=".str_replace(" ", "%20", $engname).$comnameprefix."&sort=relevance".$args."&per_page=5&media=photos&format=json&nojsoncallback=1"), true)["photos"]["photo"];
