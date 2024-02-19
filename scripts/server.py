@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 
 userDir = os.path.expanduser('~')
-INTERPRETER, INCLUDE_LIST, EXCLUDE_LIST = (None, None, None)
+INTERPRETER, M_INTERPRETER, INCLUDE_LIST, EXCLUDE_LIST = (None, None, None, None)
 PREDICTED_SPECIES_LIST = []
 model, priv_thresh, sf_thresh = (None, None, None)
 
@@ -92,10 +92,7 @@ def predictFilter(lat, lon, week):
     global M_INTERPRETER
 
     # Does interpreter exist?
-    try:
-        if M_INTERPRETER is None:
-            loadMetaModel()
-    except Exception:
+    if M_INTERPRETER is None:
         loadMetaModel()
 
     # Prepare mdata as sample
