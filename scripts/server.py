@@ -72,8 +72,13 @@ def loadMetaModel():
     global M_INPUT_LAYER_INDEX
     global M_OUTPUT_LAYER_INDEX
 
+    if get_settings().getint('DATA_MODEL_VERSION') == 2:
+        data_model = 'BirdNET_GLOBAL_6K_V2.4_MData_Model_V2_FP16.tflite'
+    else:
+        data_model = 'BirdNET_GLOBAL_6K_V2.4_MData_Model_FP16.tflite'
+
     # Load TFLite model and allocate tensors.
-    M_INTERPRETER = tflite.Interpreter(model_path=userDir + '/BirdNET-Pi/model/BirdNET_GLOBAL_6K_V2.4_MData_Model_FP16.tflite')
+    M_INTERPRETER = tflite.Interpreter(model_path=os.path.join(userDir, 'BirdNET-Pi/model', data_model))
     M_INTERPRETER.allocate_tensors()
 
     # Get input and output tensors.
