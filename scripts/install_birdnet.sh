@@ -8,6 +8,7 @@ my_dir=$HOME/BirdNET-Pi
 export my_dir=$my_dir
 
 cd $my_dir/scripts || exit 1
+git log -n 1 --pretty=oneline --no-color --decorate
 
 source install_helpers.sh
 
