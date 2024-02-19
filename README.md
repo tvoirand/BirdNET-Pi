@@ -12,9 +12,27 @@ A realtime acoustic bird classification system for the Raspberry Pi 4B, 400, 3B+
 <p align="center">
 Icon made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
 </p>
-<p>
+
+## About this fork:
+I've been building on [mcguirepr89's](https://github.com/mcguirepr89/BirdNET-Pi) most excellent work to further update and improve BirdNET-Pi. Maybe someone will find it useful.
+
+Changes include:
+
+ - Bookworm support
+ - Experimental support for writing transient files to tmpfs
+ - Rework analysis to consolidate analysis/server/extraction. Should make analysis more robust and slightly more efficient, especially on installations with a large number of recordings
+ - Bump tflite_runtime to 2.11.0, it is faster
+ - Rework daily_plot.py (chart_viewer) to run as a daemon to avoid the very expensive startup
+ - Bump apprise version, so more notification type are possible
+ - Fix: Setting Excluded/Custom species from the UI, that have a ' now works
+ - Fix: Setting apprise notification body and apprise notification title that include 'special' characters like `"{}` now is possible. So you can send json now
+ - Fix: add missing languages for new model
+ - Fix: Daily Chart was not including new detections due to caching
+ - Fix: changing advanced settings was not updating on a fresh install ed. CHANNELS, RECORDING_LENGTH, ... simplify
+ - Fix: PrivacyThreshold now works as intended
+ - Support for 'Species range model V2.4 - V2'
+
 !! note: see 'Migrating' on how to migrate from mcguirepr89
-</p>
 
 ## Introduction
 BirdNET-Pi is built on the [BirdNET framework](https://github.com/kahst/BirdNET-Analyzer) by [**@kahst**](https://github.com/kahst) <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg"></a> using [pre-built TFLite binaries](https://github.com/PINTO0309/TensorflowLite-bin) by [**@PINTO0309**](https://github.com/PINTO0309) . It is able to recognize bird sounds from a USB microphone or sound card in realtime and share its data with the rest of the world.
