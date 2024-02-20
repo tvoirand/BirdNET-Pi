@@ -465,6 +465,8 @@ if(isset($_GET['species'])){ ?>
   $fp = @fopen($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", 'r'); 
 if ($fp) {
   $disk_check_exclude_arr = explode("\n", fread($fp, filesize($home."/BirdNET-Pi/scripts/disk_check_exclude.txt")));
+} else {
+  $disk_check_exclude_arr = [];
 }
 
 $name = $_GET['species'];
