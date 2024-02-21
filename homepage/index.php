@@ -4,25 +4,10 @@
 $_GET   = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
 $_POST  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
-$sys_timezone = "";
-// If we can get the timezome from the systems timezone file ust that
-if (file_exists('/etc/timezone')) {
-	$tz_data = file_get_contents('/etc/timezone');
-	if ($tz_data !== false) {
-		$sys_timezone = trim($tz_data);
-	}
-} else {
-// Else get timezone from the timedatectl command
-	$tz_data = shell_exec('timedatectl show');
-	$tz_data_array = parse_ini_string($tz_data);
-	if (is_array($tz_data_array) && array_key_exists('Timezone', $tz_data_array)) {
-		$sys_timezone = $tz_data_array['Timezone'];
-	}
+if(!isset($_SESSION['my_timezone'])) {
+  $_SESSION['my_timezone'] = trim(shell_exec('timedatectl show --value --property=Timezone'));
 }
-//Finally if we have a valod timezone, set it as the one PHP uses
-if ($sys_timezone !== "") {
-	date_default_timezone_set($sys_timezone);
-}
+date_default_timezone_set($_SESSION['my_timezone']);
 
   if (file_exists('./scripts/thisrun.txt')) {
     $config = parse_ini_file('./scripts/thisrun.txt');
