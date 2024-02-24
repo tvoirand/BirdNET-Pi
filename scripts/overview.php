@@ -5,6 +5,11 @@ ini_set('session.gc_maxlifetime', 7200);
 ini_set('user_agent', 'PHP_Flickr/1.0');
 session_set_cookie_params(7200);
 session_start();
+
+if(!isset($_SESSION['my_timezone'])) {
+  $_SESSION['my_timezone'] = trim(shell_exec('timedatectl show --value --property=Timezone'));
+}
+date_default_timezone_set($_SESSION['my_timezone']);
 $myDate = date('Y-m-d');
 $chart = "Combo-$myDate.png";
 

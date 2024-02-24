@@ -1,7 +1,10 @@
 <?php
 error_reporting(E_ERROR);
 ini_set('display_errors',1);
-
+if(!isset($_SESSION['my_timezone'])) {
+  $_SESSION['my_timezone'] = trim(shell_exec('timedatectl show --value --property=Timezone'));
+}
+date_default_timezone_set($_SESSION['my_timezone']);
 $user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
 $home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
 $home = trim($home);
@@ -114,6 +117,7 @@ if(isset($_GET["latitude"])){
 
   if(isset($timezone) && in_array($timezone, DateTimeZone::listIdentifiers())) {
     shell_exec("sudo timedatectl set-timezone ".$timezone);
+    $_SESSION['my_timezone'] = $timezone;
     date_default_timezone_set($timezone);
     echo "<script>setTimeout(
     function() {
@@ -688,7 +692,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
         Select a timezone
       </option>
       <?php
-      $current_timezone = trim(shell_exec("cat /etc/timezone"));
+      $current_timezone = trim(shell_exec("timedatectl show --value --property=Timezone"));
       $timezone_identifiers = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
         
       $n = 425;
