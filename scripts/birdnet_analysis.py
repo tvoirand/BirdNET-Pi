@@ -6,13 +6,14 @@ import signal
 import sys
 import threading
 from queue import Queue
+from subprocess import CalledProcessError
 
 import inotify.adapters
 from inotify.constants import IN_CLOSE_WRITE
 
-from utils.reporting import extract_detection, summary, write_to_file, write_to_db, apprise, bird_weather, heartbeat
 from server import load_global_model, run_analysis
 from utils.helpers import get_settings, ParseFileName, get_wav_files, write_settings, ANALYZING_NOW
+from utils.reporting import extract_detection, summary, write_to_file, write_to_db, apprise, bird_weather, heartbeat
 
 shutdown = False
 
@@ -94,7 +95,8 @@ def process_file(file_name, report_queue):
         report_queue.join()
         report_queue.put((file, detections))
     except BaseException as e:
-        log.exception('Unexpected error:', exc_info=e)
+        stderr = e.stderr.decode('utf-8') if isinstance(e, CalledProcessError) else ""
+        log.exception(f'Unexpected error: {stderr}', exc_info=e)
 
 
 def handle_reporting_queue(queue):
@@ -116,7 +118,8 @@ def handle_reporting_queue(queue):
             heartbeat()
             os.remove(file.file_name)
         except BaseException as e:
-            log.exception('Unexpected error:', exc_info=e)
+            stderr = e.stderr.decode('utf-8') if isinstance(e, CalledProcessError) else ""
+            log.exception(f'Unexpected error: {stderr}', exc_info=e)
 
         queue.task_done()
 
