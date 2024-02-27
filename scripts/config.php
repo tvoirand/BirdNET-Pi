@@ -234,6 +234,7 @@ if(isset($_GET["latitude"])){
 
     $appriseconfig = fopen($home."/BirdNET-Pi/apprise.txt", "w");
     fwrite($appriseconfig, $apprise_input);
+    $apprise_config = $apprise_input;
   }
 
   syslog(LOG_INFO, "Restarting Services");
