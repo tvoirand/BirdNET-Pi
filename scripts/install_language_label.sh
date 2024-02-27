@@ -14,7 +14,8 @@ while getopts "l:" o; do
 done
 shift $((OPTIND-1))
 
-HOME=$(awk -F: '/1000/ {print $6}' /etc/passwd)
+source /etc/birdnet/birdnet.conf
+HOME=/home/${BIRDNET_USER}
 
 label_file_name="labels_${lang}.txt"
 

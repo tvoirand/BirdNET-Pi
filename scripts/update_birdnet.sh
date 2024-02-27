@@ -5,8 +5,13 @@ trap 'exit 1' SIGINT SIGHUP
 
 usage() { echo "Usage: $0 [-r <remote name>] [-b <branch name>]" 1>&2; exit 1; }
 
-USER=$(awk -F: '/1000/ {print $1}' /etc/passwd)
-HOME=$(awk -F: '/1000/ {print $6}' /etc/passwd)
+if [ -n "${BIRDNET_USER}" ]; then
+  USER=${BIRDNET_USER}
+  HOME=/home/${BIRDNET_USER}
+else
+  USER=$(awk -F: '/1000/ {print $1}' /etc/passwd)
+  HOME=$(awk -F: '/1000/ {print $6}' /etc/passwd)
+fi
 my_dir=$HOME/BirdNET-Pi/scripts
 
 # Defaults

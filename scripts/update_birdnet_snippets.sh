@@ -2,10 +2,15 @@
 set -x
 # Update BirdNET-Pi
 trap 'exit 1' SIGINT SIGHUP
-USER=$(awk -F: '/1000/ {print $1}' /etc/passwd)
-HOME=$(awk -F: '/1000/ {print $6}' /etc/passwd)
-my_dir=$HOME/BirdNET-Pi/scripts
 source /etc/birdnet/birdnet.conf
+if [ -n "${BIRDNET_USER}" ]; then
+  USER=${BIRDNET_USER}
+  HOME=/home/${BIRDNET_USER}
+else
+  USER=$(awk -F: '/1000/ {print $1}' /etc/passwd)
+  HOME=$(awk -F: '/1000/ {print $6}' /etc/passwd)
+fi
+my_dir=$HOME/BirdNET-Pi/scripts
 source "$my_dir/install_helpers.sh"
 
 # Sets proper permissions and ownership
@@ -63,6 +68,12 @@ sed -i -E "s/$SRC/$DST/" /etc/birdnet/birdnet.conf
 
 if ! grep -E '^DATA_MODEL_VERSION=' /etc/birdnet/birdnet.conf &>/dev/null;then
     echo "DATA_MODEL_VERSION=1" >> /etc/birdnet/birdnet.conf
+fi
+
+if ! grep -E '^BIRDNET_USER=' /etc/birdnet/birdnet.conf &>/dev/null;then
+  echo "## BIRDNET_USER is for scripts to easily find where BirdNET-Pi is installed" >> /etc/birdnet/birdnet.conf
+  echo "## DO NOT EDIT!" >> /etc/birdnet/birdnet.conf
+  echo "BIRDNET_USER=$(awk -F: '/1000/ {print $1}' /etc/passwd)" >> /etc/birdnet/birdnet.conf
 fi
 
 if ! grep -E '^RTSP_STREAM_TO_LIVESTREAM=' /etc/birdnet/birdnet.conf &>/dev/null;then

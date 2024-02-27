@@ -121,6 +121,11 @@ FLICKR_FILTER_EMAIL=
 #--------------------------------  Defaults  ----------------------------------#
 ################################################################################
 
+## BIRDNET_USER is for scripts to easily find where BirdNET-Pi is installed
+## DO NOT EDIT!
+
+BIRDNET_USER=$USER
+
 ## RECS_DIR is the location birdnet_analysis.service will look for the data-set
 ## it needs to analyze. Be sure this directory is readable and writable for
 ## the BIRDNET_USER.
