@@ -217,8 +217,8 @@ if(isset($_GET['bydate'])){
   $result3 = $statement3->execute();
   $view = "species";
 } else {
-  session_start();
-  session_unset();
+  unset($_SESSION['species']);
+  unset($_SESSION['date']);
   $view = "choose";
 }
 ?>
