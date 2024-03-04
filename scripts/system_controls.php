@@ -8,14 +8,17 @@ $fetch = shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi fetch 2>&1");
 $str = trim(shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi status"));
 if (preg_match("/behind '.*?' by (\d+) commit(s?)\b/", $str, $matches)) {
   $num_commits_behind = $matches[1];
-  $_SESSION['behind'] = $num_commits_behind; 
 }
 if (preg_match('/\b(\d+)\b and \b(\d+)\b different commits each/', $str, $matches)) {
     $num1 = (int) $matches[1];
     $num2 = (int) $matches[2];
-    $sum = $num1 + $num2;
-    $_SESSION['behind'] = $sum; 
+    $num_commits_behind = $num1 + $num2;
 }
+if (stripos($str, "Your branch is up to date") !== false) {
+  $num_commits_behind = '0';
+}
+$_SESSION['behind'] = $num_commits_behind;
+$_SESSION['behind_time'] = time();
 ?><html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <br>
