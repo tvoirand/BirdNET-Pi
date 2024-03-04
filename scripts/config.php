@@ -251,7 +251,8 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
     $config = parse_ini_file($home.'/BirdNET-Pi/scripts/thisrun.ini');
   }
 
-  $db = new SQLite3($home."/BirdNET-Pi/scripts/birds.db", SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
+  $db = new SQLite3($home."/BirdNET-Pi/scripts/birds.db", SQLITE3_OPEN_READONLY);
+  $db->busyTimeout(1000);
 
   $cf = explode("\n",$_GET['apprise_config']);
   $cf = "'".implode("' '", $cf)."'";

@@ -7,6 +7,7 @@ $_POST  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 error_reporting(E_ALL);
 ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
+require_once 'scripts/common.php';
 
 if (file_exists('./scripts/thisrun.txt')) {
   $config = parse_ini_file('./scripts/thisrun.txt');
@@ -22,10 +23,11 @@ $theDate = date('Y-m-d');
 $chart = "Combo-$theDate.png";
 $chart2 = "Combo2-$theDate.png";
 
-$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
+$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
+$db->busyTimeout(1000);
 
-$statement1 = $db->prepare("SELECT COUNT(*) FROM detections
-	WHERE Date == \"$theDate\"");
+$statement1 = $db->prepare("SELECT COUNT(*) FROM detections WHERE Date == \"$theDate\"");
+ensure_db_ok($statement1);
 $result1 = $statement1->execute();
 $totalcount = $result1->fetchArray(SQLITE3_ASSOC);
 
@@ -52,10 +54,7 @@ if(isset($_GET['blocation']) ) {
 		$starttime = strtotime("12 AM") + (3600*$i);
 
 		$statement1 = $db->prepare("SELECT DISTINCT(Com_Name), COUNT(*) FROM detections WHERE Date == \"$theDate\" AND Time > '".date("H:i", $starttime)."' AND Time < '".date("H:i",$starttime + 3600)."' AND Confidence > 0.75 GROUP By Com_Name ORDER BY COUNT(*) DESC");
-		if($statement1 == False){
-		  echo "Database is busy";
-		  header("refresh: 0;");
-		}
+		ensure_db_ok($statement1);
 		$result1 = $statement1->execute();
 
 		$detections = [];
