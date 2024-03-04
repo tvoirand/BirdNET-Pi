@@ -27,20 +27,19 @@ if(isset($_GET['deletefile'])) {
     $submittedpwd = $_SERVER['PHP_AUTH_PW'];
     $submitteduser = $_SERVER['PHP_AUTH_USER'];
     if($submittedpwd == $config['CADDY_PWD'] && $submitteduser == 'birdnet'){
-      $statement1 = $db->prepare('DELETE FROM detections WHERE File_Name = "'.explode("/",$_GET['deletefile'])[2].'" LIMIT 1');
-      if($statement1 == False){
-        echo "Error";
-        header("refresh: 0;");
+      $db_writable = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READWRITE);
+      $db->busyTimeout(1000);
+      $statement1 = $db_writable->prepare('DELETE FROM detections WHERE File_Name = :file_name LIMIT 1');
+      ensure_db_ok($statement1);
+      $statement1->bindValue(':file_name', explode("/", $_GET['deletefile'])[2]);
+      $file_pointer = $home."/BirdSongs/Extracted/By_Date/".$_GET['deletefile'];
+      if (!exec("sudo rm $file_pointer && sudo rm $file_pointer.png")) {
+        echo "OK";
       } else {
-        $file_pointer = $home."/BirdSongs/Extracted/By_Date/".$_GET['deletefile'];
-        if (!exec("sudo rm $file_pointer && sudo rm $file_pointer.png")) {
-          echo "OK";
-        } else {
-          echo "Error";
-        }
-
+        echo "Error";
       }
       $result1 = $statement1->execute();
+      $db_writable->close();
       die();
     } else {
       header('WWW-Authenticate: Basic realm="My Realm"');
