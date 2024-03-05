@@ -25,7 +25,8 @@ function service_mount() {
   $service_mount=trim(shell_exec("systemd-escape -p --suffix=mount ".$home."/BirdSongs/StreamData"));
   return $service_mount;
 }
-if(!isset($_SESSION['behind']) || !isset($_SESSION['behind_time']) || time() > $_SESSION['behind_time'] + 86400) {
+$authenticated = isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_PW'] == $config['CADDY_PWD'] && $_SERVER['PHP_AUTH_USER'] == 'birdnet';
+if($authenticated && (!isset($_SESSION['behind']) || !isset($_SESSION['behind_time']) || time() > $_SESSION['behind_time'] + 86400)) {
   shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi fetch > /dev/null 2>/dev/null &");
   $str = trim(shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi status"));
   if (preg_match("/behind '.*?' by (\d+) commit(s?)\b/", $str, $matches)) {
