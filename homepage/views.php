@@ -15,6 +15,11 @@ $user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
 $user = trim($user);
 $home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
 $home = trim($home);
+if (file_exists('./scripts/thisrun.txt')) {
+  $config = parse_ini_file('./scripts/thisrun.txt');
+} elseif (file_exists('./scripts/firstrun.ini')) {
+  $config = parse_ini_file('./scripts/firstrun.ini');
+}
 function service_mount() {
   global $home;
   $service_mount=trim(shell_exec("systemd-escape -p --suffix=mount ".$home."/BirdSongs/StreamData"));
@@ -44,13 +49,6 @@ if(isset($_SESSION['behind'])&&intval($_SESSION['behind']) >= 99) {?>
   }
   </style>
 <?php }
-
-if (file_exists('./scripts/thisrun.txt')) {
-  $config = parse_ini_file('./scripts/thisrun.txt');
-} elseif (file_exists('./scripts/firstrun.ini')) {
-  $config = parse_ini_file('./scripts/firstrun.ini');
-}
-
 if ($config["LATITUDE"] == "0.000" && $config["LONGITUDE"] == "0.000") {
   echo "<center style='color:red'><b>WARNING: Your latitude and longitude are not set properly. Please do so now in Tools -> Settings.</center></b>";
 }
