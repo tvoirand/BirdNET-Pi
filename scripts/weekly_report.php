@@ -2,6 +2,7 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+require_once 'scripts/common.php';
 
 $startdate = strtotime('last sunday') - (7*86400);
 $enddate = strtotime('last sunday') - (1*86400);
@@ -10,48 +11,30 @@ $debug = false;
 
 if(isset($_GET['ascii'])) {
 
-	$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
-	if($db == False){
-	  echo "Database is busy";
-	  header("refresh: 0;");
-	}
+	$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
+	$db->busyTimeout(1000);
 
 	$statement1 = $db->prepare('SELECT DISTINCT(Com_Name), COUNT(*) FROM detections WHERE Date BETWEEN "'.date("Y-m-d",$startdate).'" AND "'.date("Y-m-d",$enddate).'" GROUP By Com_Name ORDER BY COUNT(*) DESC');
-	if($statement1 == False){
-	  echo "Database is busy";
-	  header("refresh: 0;");
-	}
+	ensure_db_ok($statement1);
 	$result1 = $statement1->execute();
 
 	$statement4 = $db->prepare('SELECT DISTINCT(Com_Name), COUNT(*) FROM detections WHERE Date BETWEEN "'.date("Y-m-d",$startdate).'" AND "'.date("Y-m-d",$enddate).'"');
-	if($statement4 == False){
-	  echo "Database is busy";
-	  header("refresh: 0;");
-	}
+	ensure_db_ok($statement4);
 	$result4 = $statement4->execute();
 	$totalcount = $result4->fetchArray(SQLITE3_ASSOC)['COUNT(*)'];
 
 	$statement5 = $db->prepare('SELECT DISTINCT(Com_Name), COUNT(*) FROM detections WHERE Date BETWEEN "'.date("Y-m-d",$startdate- (7*86400)).'" AND "'.date("Y-m-d",$enddate- (7*86400)).'"');
-	if($statement5 == False){
-	  echo "Database is busy";
-	  header("refresh: 0;");
-	}
+	ensure_db_ok($statement5);
 	$result5 = $statement5->execute();
 	$priortotalcount = $result5->fetchArray(SQLITE3_ASSOC)['COUNT(*)'];
 
 	$statement6 = $db->prepare('SELECT COUNT(DISTINCT(Com_Name)) FROM detections WHERE Date BETWEEN "'.date("Y-m-d",$startdate).'" AND "'.date("Y-m-d",$enddate).'"');
-	if($statement6 == False){
-	  echo "Database is busy";
-	  header("refresh: 0;");
-	}
+	ensure_db_ok($statement6);
 	$result6 = $statement6->execute();
 	$totalspeciestally = $result6->fetchArray(SQLITE3_ASSOC)['COUNT(DISTINCT(Com_Name))'];
 
 	$statement7 = $db->prepare('SELECT COUNT(DISTINCT(Com_Name)) FROM detections WHERE Date BETWEEN "'.date("Y-m-d",$startdate- (7*86400)).'" AND "'.date("Y-m-d",$enddate- (7*86400)).'"');
-	if($statement7 == False){
-	  echo "Database is busy";
-	  header("refresh: 0;");
-	}
+	ensure_db_ok($statement7);
 	$result7= $statement7->execute();
 	$priortotalspeciestally = $result7->fetchArray(SQLITE3_ASSOC)['COUNT(DISTINCT(Com_Name))'];
 
@@ -91,10 +74,7 @@ if(isset($_GET['ascii'])) {
 
 		if($i <= 10) {
 			$statement2 = $db->prepare('SELECT COUNT(*) FROM detections WHERE Com_Name == "'.$com_name.'" AND Date BETWEEN "'.date("Y-m-d",$startdate - (7*86400)).'" AND "'.date("Y-m-d",$enddate - (7*86400)).'"');
-			if($statement2 == False){
-			  echo "Database is busy";
-			  header("refresh: 0;");
-			}
+			ensure_db_ok($statement2);
 			$result2 = $statement2->execute();
 			$totalcount = $result2->fetchArray(SQLITE3_ASSOC);
 			$priorweekcount = $totalcount['COUNT(*)'];
@@ -122,10 +102,7 @@ if(isset($_GET['ascii'])) {
 	foreach($detections as $com_name=>$scount)
 	{
 		$statement3 = $db->prepare('SELECT COUNT(*) FROM detections WHERE Com_Name == "'.$com_name.'" AND Date NOT BETWEEN "'.date("Y-m-d",$startdate).'" AND "'.date("Y-m-d",$enddate).'"');
-		if($statement3 == False){
-		  echo "Database is busy";
-		  header("refresh: 0;");
-		}
+		ensure_db_ok($statement3);
 		$result3 = $statement3->execute();
 		$totalcount = $result3->fetchArray(SQLITE3_ASSOC);
 		$nonthisweekcount = $totalcount['COUNT(*)'];
@@ -153,21 +130,14 @@ if(isset($_GET['ascii'])) {
 echo "<h1>Week ".date('W', $enddate)." Report</h1>".date('F jS, Y',$startdate)." — ".date('F jS, Y',$enddate)."<br>";
 ?></div><?php
 
-$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
-if($db == False){
-  echo "Database is busy";
-  header("refresh: 0;");
-}
-
+$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
+$db->busyTimeout(1000);
 if($debug == false){
 $statement1 = $db->prepare('SELECT DISTINCT(Com_Name), COUNT(*) FROM detections WHERE Date BETWEEN "'.date("Y-m-d",$startdate).'" AND "'.date("Y-m-d",$enddate).'" GROUP By Com_Name ORDER BY COUNT(*) DESC');
 } else {
 	$statement1 = $db->prepare('SELECT DISTINCT(Com_Name), COUNT(*) FROM detections WHERE Date BETWEEN "'.date("Y-m-d",$startdate).'" AND "'.date("Y-m-d",$enddate).'" GROUP By Com_Name ORDER BY COUNT(*) ASC');
 }
-if($statement1 == False){
-  echo "Database is busy";
-  header("refresh: 0;");
-}
+ensure_db_ok($statement1);
 $result1 = $statement1->execute();
 
 $detections = [];
@@ -202,10 +172,7 @@ while($detection=$result1->fetchArray(SQLITE3_ASSOC))
 		$i++;
 		if($i <= 10) {
 			$statement2 = $db->prepare('SELECT COUNT(*) FROM detections WHERE Com_Name == "'.$com_name.'" AND Date BETWEEN "'.date("Y-m-d",$startdate - (7*86400)).'" AND "'.date("Y-m-d",$enddate - (7*86400)).'"');
-			if($statement2 == False){
-			  echo "Database is busy";
-			  header("refresh: 0;");
-			}
+			ensure_db_ok($statement2);
 			$result2 = $statement2->execute();
 			$totalcount = $result2->fetchArray(SQLITE3_ASSOC);
 			$priorweekcount = $totalcount['COUNT(*)'];
@@ -243,10 +210,7 @@ while($detection=$result1->fetchArray(SQLITE3_ASSOC))
 	foreach($detections as $com_name=>$scount)
 	{
 		$statement3 = $db->prepare('SELECT COUNT(*) FROM detections WHERE Com_Name == "'.$com_name.'" AND Date NOT BETWEEN "'.date("Y-m-d",$startdate).'" AND "'.date("Y-m-d",$enddate).'"');
-		if($statement3 == False){
-		  echo "Database is busy";
-		  header("refresh: 0;");
-		}
+		ensure_db_ok($statement3);
 		$result3 = $statement3->execute();
 		$totalcount = $result3->fetchArray(SQLITE3_ASSOC);
 		$nonthisweekcount = $totalcount['COUNT(*)'];

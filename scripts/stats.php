@@ -7,42 +7,28 @@ $_POST  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 ini_set('user_agent', 'PHP_Flickr/1.0');
 error_reporting(0);
 ini_set('display_errors', 0);
+require_once 'scripts/common.php';
 
-$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
-if($db == False) {
-  echo "Database busy";
-  header("refresh: 0;");
-}
+$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
+$db->busyTimeout(1000);
 
 if(isset($_GET['sort']) && $_GET['sort'] == "occurrences") {
   
   $statement = $db->prepare('SELECT Date, Time, File_Name, Com_Name, COUNT(*), MAX(Confidence) FROM detections GROUP BY Com_Name ORDER BY COUNT(*) DESC');
-  if($statement == False) {
-    echo "Database busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement);
   $result = $statement->execute();
 
   $statement2 = $db->prepare('SELECT Date, Time, File_Name, Com_Name, COUNT(*), MAX(Confidence) FROM detections GROUP BY Com_Name ORDER BY COUNT(*) DESC');
-  if($statement == False) {
-    echo "Database busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement2);
   $result2 = $statement2->execute();
 } else {
 
   $statement = $db->prepare('SELECT Date, Time, File_Name, Com_Name, COUNT(*), MAX(Confidence) FROM detections GROUP BY Com_Name ORDER BY Com_Name ASC');
-  if($statement == False) {
-    echo "Database busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement);
   $result = $statement->execute();
 
   $statement2 = $db->prepare('SELECT Date, Time, File_Name, Com_Name, COUNT(*), MAX(Confidence) FROM detections GROUP BY Com_Name ORDER BY Com_Name ASC');
-  if($statement == False) {
-    echo "Database busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement2);
   $result2 = $statement2->execute();
 }
 
@@ -51,10 +37,7 @@ if(isset($_GET['sort']) && $_GET['sort'] == "occurrences") {
 if(isset($_GET['species'])){
   $selection = $_GET['species'];
   $statement3 = $db->prepare("SELECT Com_Name, Sci_Name, COUNT(*), MAX(Confidence), File_Name, Date, Time from detections WHERE Com_Name = \"$selection\"");
-  if($statement3 == False) {
-    echo "Database busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement3);
   $result3 = $statement3->execute();
 }
 

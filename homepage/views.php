@@ -15,24 +15,33 @@ $user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
 $user = trim($user);
 $home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
 $home = trim($home);
+if (file_exists('./scripts/thisrun.txt')) {
+  $config = parse_ini_file('./scripts/thisrun.txt');
+} elseif (file_exists('./scripts/firstrun.ini')) {
+  $config = parse_ini_file('./scripts/firstrun.ini');
+}
 function service_mount() {
   global $home;
   $service_mount=trim(shell_exec("systemd-escape -p --suffix=mount ".$home."/BirdSongs/StreamData"));
   return $service_mount;
 }
-if(!isset($_SESSION['behind'])) {
-  $fetch = shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi fetch 2>&1");
+$authenticated = isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_PW'] == $config['CADDY_PWD'] && $_SERVER['PHP_AUTH_USER'] == 'birdnet';
+if($authenticated && (!isset($_SESSION['behind']) || !isset($_SESSION['behind_time']) || time() > $_SESSION['behind_time'] + 86400)) {
+  shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi fetch > /dev/null 2>/dev/null &");
   $str = trim(shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi status"));
   if (preg_match("/behind '.*?' by (\d+) commit(s?)\b/", $str, $matches)) {
     $num_commits_behind = $matches[1];
-    $_SESSION['behind'] = $num_commits_behind; 
   }
   if (preg_match('/\b(\d+)\b and \b(\d+)\b different commits each/', $str, $matches)) {
-      $num1 = (int) $matches[1];
-      $num2 = (int) $matches[2];
-      $sum = $num1 + $num2;
-      $_SESSION['behind'] = $sum; 
+    $num1 = (int) $matches[1];
+    $num2 = (int) $matches[2];
+    $num_commits_behind = $num1 + $num2;
   }
+  if (stripos($str, "Your branch is up to date") !== false) {
+    $num_commits_behind = '0';
+  }
+  $_SESSION['behind'] = $num_commits_behind;
+  $_SESSION['behind_time'] = time();
 }
 if(isset($_SESSION['behind'])&&intval($_SESSION['behind']) >= 99) {?>
   <style>
@@ -41,13 +50,6 @@ if(isset($_SESSION['behind'])&&intval($_SESSION['behind']) >= 99) {?>
   }
   </style>
 <?php }
-
-if (file_exists('./scripts/thisrun.txt')) {
-  $config = parse_ini_file('./scripts/thisrun.txt');
-} elseif (file_exists('./scripts/firstrun.ini')) {
-  $config = parse_ini_file('./scripts/firstrun.ini');
-}
-
 if ($config["LATITUDE"] == "0.000" && $config["LONGITUDE"] == "0.000") {
   echo "<center style='color:red'><b>WARNING: Your latitude and longitude are not set properly. Please do so now in Tools -> Settings.</center></b>";
 }

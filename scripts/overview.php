@@ -5,6 +5,7 @@ ini_set('session.gc_maxlifetime', 7200);
 ini_set('user_agent', 'PHP_Flickr/1.0');
 session_set_cookie_params(7200);
 session_start();
+require_once 'scripts/common.php';
 
 if(!isset($_SESSION['my_timezone'])) {
   $_SESSION['my_timezone'] = trim(shell_exec('timedatectl show --value --property=Timezone'));
@@ -13,11 +14,8 @@ date_default_timezone_set($_SESSION['my_timezone']);
 $myDate = date('Y-m-d');
 $chart = "Combo-$myDate.png";
 
-$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
-if($db == False) {
-  echo "Database is busy";
-  header("refresh: 0;");
-}
+$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
+$db->busyTimeout(1000);
 
 if (file_exists('./scripts/thisrun.txt')) {
   $config = parse_ini_file('./scripts/thisrun.txt');
@@ -30,10 +28,7 @@ $home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
 $home = trim($home);
 
 $statement2 = $db->prepare('SELECT COUNT(*) FROM detections WHERE Date == DATE(\'now\', \'localtime\')');
-if($statement2 == False) {
-  echo "Database is busy";
-  header("refresh: 0;");
-}
+ensure_db_ok($statement2);
 $result2 = $statement2->execute();
 $todaycount = $result2->fetchArray(SQLITE3_ASSOC);
 
@@ -88,10 +83,7 @@ if(isset($_GET['fetch_chart_string']) && $_GET['fetch_chart_string'] == "true") 
 if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true" && isset($_GET['previous_detection_identifier'])) {
 
   $statement4 = $db->prepare('SELECT Com_Name, Sci_Name, Date, Time, Confidence, File_Name FROM detections ORDER BY Date DESC, Time DESC LIMIT 15');
-  if($statement4 == False) {
-    echo "Database is busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement4);
   $result4 = $statement4->execute();
   if(!isset($_SESSION['images'])) {
     $_SESSION['images'] = [];
@@ -246,34 +238,22 @@ if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true" && isse
 if(isset($_GET['ajax_left_chart']) && $_GET['ajax_left_chart'] == "true") {
 
 $statement = $db->prepare('SELECT COUNT(*) FROM detections');
-if($statement == False) {
-  echo "Database is busy";
-  header("refresh: 0;");
-}
+ensure_db_ok($statement);
 $result = $statement->execute();
 $totalcount = $result->fetchArray(SQLITE3_ASSOC);
 
 $statement3 = $db->prepare('SELECT COUNT(*) FROM detections WHERE Date == Date(\'now\', \'localtime\') AND TIME >= TIME(\'now\', \'localtime\', \'-1 hour\')');
-if($statement3 == False) {
-  echo "Database is busy";
-  header("refresh: 0;");
-}
+ensure_db_ok($statement3);
 $result3 = $statement3->execute();
 $hourcount = $result3->fetchArray(SQLITE3_ASSOC);
 
 $statement5 = $db->prepare('SELECT COUNT(DISTINCT(Com_Name)) FROM detections WHERE Date == Date(\'now\',\'localtime\')');
-if($statement5 == False) {
-  echo "Database is busy";
-  header("refresh: 0;");
-}
+ensure_db_ok($statement5);
 $result5 = $statement5->execute();
 $speciestally = $result5->fetchArray(SQLITE3_ASSOC);
 
 $statement6 = $db->prepare('SELECT COUNT(DISTINCT(Com_Name)) FROM detections');
-if($statement6 == False) {
-  echo "Database is busy";
-  header("refresh: 0;");
-}
+ensure_db_ok($statement6);
 $result6 = $statement6->execute();
 $totalspeciestally = $result6->fetchArray(SQLITE3_ASSOC);
   

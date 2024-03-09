@@ -6,12 +6,10 @@ $_POST  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
 error_reporting(E_ERROR);
 ini_set('display_errors',1);
+require_once 'scripts/common.php';
 
-$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
-if($db == False){
-  echo "Database is busy";
-  header("refresh: 0;");
-}
+$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
+$db->busyTimeout(1000);
 
 if (file_exists('./scripts/thisrun.txt')) {
   $config = parse_ini_file('./scripts/thisrun.txt');
@@ -29,20 +27,19 @@ if(isset($_GET['deletefile'])) {
     $submittedpwd = $_SERVER['PHP_AUTH_PW'];
     $submitteduser = $_SERVER['PHP_AUTH_USER'];
     if($submittedpwd == $config['CADDY_PWD'] && $submitteduser == 'birdnet'){
-      $statement1 = $db->prepare('DELETE FROM detections WHERE File_Name = "'.explode("/",$_GET['deletefile'])[2].'" LIMIT 1');
-      if($statement1 == False){
-        echo "Error";
-        header("refresh: 0;");
+      $db_writable = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READWRITE);
+      $db->busyTimeout(1000);
+      $statement1 = $db_writable->prepare('DELETE FROM detections WHERE File_Name = :file_name LIMIT 1');
+      ensure_db_ok($statement1);
+      $statement1->bindValue(':file_name', explode("/", $_GET['deletefile'])[2]);
+      $file_pointer = $home."/BirdSongs/Extracted/By_Date/".$_GET['deletefile'];
+      if (!exec("sudo rm $file_pointer && sudo rm $file_pointer.png")) {
+        echo "OK";
       } else {
-        $file_pointer = $home."/BirdSongs/Extracted/By_Date/".$_GET['deletefile'];
-        if (!exec("sudo rm $file_pointer && sudo rm $file_pointer.png")) {
-          echo "OK";
-        } else {
-          echo "Error";
-        }
-
+        echo "Error";
       }
       $result1 = $statement1->execute();
+      $db_writable->close();
       die();
     } else {
       header('WWW-Authenticate: Basic realm="My Realm"');
@@ -163,10 +160,7 @@ if (!isset($_SERVER['PHP_AUTH_USER'])) {
 
 if(isset($_GET['bydate'])){
   $statement = $db->prepare('SELECT DISTINCT(Date) FROM detections GROUP BY Date ORDER BY Date DESC');
-  if($statement == False){
-    echo "Database is busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement);
   $result = $statement->execute();
   $view = "bydate";
 
@@ -180,10 +174,7 @@ if(isset($_GET['bydate'])){
   } else {
     $statement = $db->prepare("SELECT DISTINCT(Com_Name) FROM detections WHERE Date == \"$date\" ORDER BY Com_Name");
   }
-  if($statement == False){
-    echo "Database is busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement);
   $result = $statement->execute();
   $view = "date";
 
@@ -195,10 +186,7 @@ if(isset($_GET['bydate'])){
     $statement = $db->prepare('SELECT DISTINCT(Com_Name) FROM detections ORDER BY Com_Name ASC');
   } 
   session_start();
-  if($statement == False){
-    echo "Database is busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement);
   $result = $statement->execute();
   $view = "byspecies";
 
@@ -208,17 +196,15 @@ if(isset($_GET['bydate'])){
   session_start();
   $_SESSION['species'] = $species;
   $statement = $db->prepare("SELECT * FROM detections WHERE Com_Name == \"$species\" ORDER BY Com_Name");
+  ensure_db_ok($statement);
   $statement3 = $db->prepare("SELECT Date, Time, Sci_Name, MAX(Confidence), File_Name FROM detections WHERE Com_Name == \"$species\" ORDER BY Com_Name");
-  if($statement == False || $statement3 == False){
-    echo "Database is busy";
-    header("refresh: 0;");
-  }
+  ensure_db_ok($statement3);
   $result = $statement->execute();
   $result3 = $statement3->execute();
   $view = "species";
 } else {
-  session_start();
-  session_unset();
+  unset($_SESSION['species']);
+  unset($_SESSION['date']);
   $view = "choose";
 }
 ?>
@@ -484,10 +470,7 @@ if(isset($_SESSION['date'])) {
     $statement2 = $db->prepare("SELECT * FROM detections where Com_Name == \"$name\" ORDER BY Date DESC, Time DESC");
   }
 }
-if($statement2 == False){
-  echo "Database is busy";
-  header("refresh: 0;");
-}
+ensure_db_ok($statement2);
 $result2 = $statement2->execute();
 $num_rows = 0;
 while ($result2->fetchArray(SQLITE3_ASSOC)) {
@@ -574,10 +557,7 @@ echo "<table>
   if(isset($_GET['filename'])){
     $name = $_GET['filename'];
     $statement2 = $db->prepare("SELECT * FROM detections where File_name == \"$name\" ORDER BY Date DESC, Time DESC");
-    if($statement2 == False){
-      echo "Database is busy";
-      header("refresh: 0;");
-    }
+    ensure_db_ok($statement2);
     $result2 = $statement2->execute();
     echo "<table>
       <tr>
