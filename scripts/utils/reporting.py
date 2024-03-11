@@ -1,5 +1,7 @@
 import datetime
+import glob
 import gzip
+import json
 import logging
 import os
 import sqlite3
@@ -112,6 +114,29 @@ def summary(file: ParseFileName, detection: Detection):
 def write_to_file(file: ParseFileName, detection: Detection):
     with open(os.path.expanduser('~/BirdNET-Pi/BirdDB.txt'), 'a') as rfile:
         rfile.write(f'{summary(file, detection)}\n')
+
+
+def update_json_file(file: ParseFileName, detections: [Detection]):
+    if file.RTSP_id is None:
+        mask = f'{os.path.dirname(file.file_name)}/*.json'
+    else:
+        mask = f'{os.path.dirname(file.file_name)}/*{file.RTSP_id}*.json'
+    for f in glob.glob(mask):
+        log.debug(f'deleting {f}')
+        os.remove(f)
+    write_to_json_file(file, detections)
+
+
+def write_to_json_file(file: ParseFileName, detections: [Detection]):
+    conf = get_settings()
+    json_file = f'{file.file_name}.json'
+    log.debug(f'WRITING RESULTS TO {json_file}')
+    dets = {'file_name': os.path.basename(json_file), 'timestamp': file.iso8601, 'delay': conf['RECORDING_LENGTH'],
+            'detections': [{"start": det.start, "common_name": det.common_name, "confidence": det.confidence} for det in
+                           detections]}
+    with open(json_file, 'w') as rfile:
+        rfile.write(json.dumps(dets))
+    log.debug(f'DONE! WROTE {len(detections)} RESULTS.')
 
 
 def apprise(file: ParseFileName, detections: [Detection]):

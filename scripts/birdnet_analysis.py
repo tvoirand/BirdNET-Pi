@@ -13,7 +13,8 @@ from inotify.constants import IN_CLOSE_WRITE
 
 from server import load_global_model, run_analysis
 from utils.helpers import get_settings, ParseFileName, get_wav_files, write_settings, ANALYZING_NOW
-from utils.reporting import extract_detection, summary, write_to_file, write_to_db, apprise, bird_weather, heartbeat
+from utils.reporting import extract_detection, summary, write_to_file, write_to_db, apprise, bird_weather, heartbeat, \
+    update_json_file
 
 shutdown = False
 
@@ -108,6 +109,7 @@ def handle_reporting_queue(queue):
 
         file, detections = msg
         try:
+            update_json_file(file, detections)
             for detection in detections:
                 detection.file_name_extr = extract_detection(file, detection)
                 log.info('%s;%s', summary(file, detection), os.path.basename(detection.file_name_extr))
