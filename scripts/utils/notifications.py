@@ -43,6 +43,23 @@ def notify(body, title, attached=""):
 def sendAppriseNotifications(species, confidence, confidencepct, path,
                              date, time, week, latitude, longitude, cutoff,
                              sens, overlap, settings_dict, db_path=DB_PATH):
+    def render_template(template, reason=""):
+        ret = template.replace("$sciname", sciName) \
+            .replace("$comname", comName) \
+            .replace("$confidencepct", confidencepct) \
+            .replace("$confidence", confidence) \
+            .replace("$listenurl", listenurl) \
+            .replace("$date", date) \
+            .replace("$time", time) \
+            .replace("$week", week) \
+            .replace("$latitude", latitude) \
+            .replace("$longitude", longitude) \
+            .replace("$cutoff", cutoff) \
+            .replace("$sens", sens) \
+            .replace("$flickrimage", image_url if "{" in body else "") \
+            .replace("$overlap", overlap) \
+            .replace("$reason", reason)
+        return ret
     # print(sendAppriseNotifications)
     # print(settings_dict)
     if os.path.exists(APPRISE_CONFIG) and os.path.getsize(APPRISE_CONFIG) > 0:
@@ -103,34 +120,8 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
                 image_url = flickr_images[comName]
 
         if settings_dict.get('APPRISE_NOTIFY_EACH_DETECTION') == "1":
-            notify_body = body.replace("$sciname", sciName)\
-                .replace("$comname", comName)\
-                .replace("$confidencepct", confidencepct)\
-                .replace("$confidence", confidence)\
-                .replace("$listenurl", listenurl)\
-                .replace("$date", date)\
-                .replace("$time", time)\
-                .replace("$week", week)\
-                .replace("$latitude", latitude)\
-                .replace("$longitude", longitude)\
-                .replace("$cutoff", cutoff)\
-                .replace("$sens", sens)\
-                .replace("$flickrimage", image_url if "{" in body else "")\
-                .replace("$overlap", overlap)
-            notify_title = title.replace("$sciname", sciName)\
-                .replace("$comname", comName)\
-                .replace("$confidencepct", confidencepct)\
-                .replace("$confidence", confidence)\
-                .replace("$listenurl", listenurl)\
-                .replace("$date", date)\
-                .replace("$time", time)\
-                .replace("$week", week)\
-                .replace("$latitude", latitude)\
-                .replace("$longitude", longitude)\
-                .replace("$cutoff", cutoff)\
-                .replace("$sens", sens)\
-                .replace("$flickrimage", image_url if "{" in body else "")\
-                .replace("$overlap", overlap)
+            notify_body = render_template(body, "detection")
+            notify_title = render_template(title, "detection")
             notify(notify_body, notify_title, image_url)
             species_last_notified[comName] = int(timeim.time())
 
@@ -148,36 +139,8 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
                     numberDetections = detections[0]
                 if numberDetections > 0 and numberDetections <= APPRISE_NOTIFICATION_NEW_SPECIES_DAILY_COUNT_LIMIT:
                     print("send the notification")
-                    notify_body = body.replace("$sciname", sciName)\
-                        .replace("$comname", comName)\
-                        .replace("$confidencepct", confidencepct)\
-                        .replace("$confidence", confidence)\
-                        .replace("$listenurl", listenurl)\
-                        .replace("$date", date)\
-                        .replace("$time", time)\
-                        .replace("$week", week)\
-                        .replace("$latitude", latitude)\
-                        .replace("$longitude", longitude)\
-                        .replace("$cutoff", cutoff)\
-                        .replace("$sens", sens)\
-                        .replace("$flickrimage", image_url if "{" in body else "")\
-                        .replace("$overlap", overlap)\
-                        + " (first time today)"
-                    notify_title = title.replace("$sciname", sciName)\
-                        .replace("$comname", comName)\
-                        .replace("$confidencepct", confidencepct)\
-                        .replace("$confidence", confidence)\
-                        .replace("$listenurl", listenurl)\
-                        .replace("$date", date)\
-                        .replace("$time", time)\
-                        .replace("$week", week)\
-                        .replace("$latitude", latitude)\
-                        .replace("$longitude", longitude)\
-                        .replace("$cutoff", cutoff)\
-                        .replace("$sens", sens)\
-                        .replace("$flickrimage", image_url if "{" in body else "")\
-                        .replace("$overlap", overlap)\
-                        + " (first time today)"
+                    notify_body = render_template(body, "first time today")
+                    notify_title = render_template(title, "first time today")
                     notify(notify_body, notify_title, image_url)
                     species_last_notified[comName] = int(timeim.time())
                 con.close()
@@ -198,36 +161,9 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
                 if len(detections):
                     numberDetections = detections[0]
                 if numberDetections > 0 and numberDetections <= 5:
-                    notify_body = body.replace("$sciname", sciName)\
-                        .replace("$comname", comName)\
-                        .replace("$confidencepct", confidencepct)\
-                        .replace("$confidence", confidence)\
-                        .replace("$listenurl", listenurl)\
-                        .replace("$date", date)\
-                        .replace("$time", time)\
-                        .replace("$week", week)\
-                        .replace("$latitude", latitude)\
-                        .replace("$longitude", longitude)\
-                        .replace("$cutoff", cutoff)\
-                        .replace("$sens", sens)\
-                        .replace("$flickrimage", image_url if "{" in body else "")\
-                        .replace("$overlap", overlap)\
-                        + " (only seen " + str(int(numberDetections)) + " times in last 7d)"
-                    notify_title = title.replace("$sciname", sciName)\
-                        .replace("$comname", comName)\
-                        .replace("$confidencepct", confidencepct)\
-                        .replace("$confidence", confidence)\
-                        .replace("$listenurl", listenurl)\
-                        .replace("$date", date)\
-                        .replace("$time", time)\
-                        .replace("$week", week)\
-                        .replace("$latitude", latitude)\
-                        .replace("$longitude", longitude)\
-                        .replace("$cutoff", cutoff)\
-                        .replace("$sens", sens)\
-                        .replace("$flickrimage", image_url if "{" in body else "")\
-                        .replace("$overlap", overlap)\
-                        + " (only seen " + str(int(numberDetections)) + " times in last 7d)"
+                    reason = f"only seen {numberDetections} times in last 7d"
+                    notify_body = render_template(body, reason)
+                    notify_title = render_template(title, reason)
                     notify(notify_body, notify_title, image_url)
                     species_last_notified[comName] = int(timeim.time())
                 con.close()

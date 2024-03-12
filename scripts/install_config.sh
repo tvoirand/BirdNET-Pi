@@ -100,7 +100,7 @@ RTSP_STREAM_TO_LIVESTREAM="0"
 #-----------------------  Apprise Miscellanous Configuration -------------------#
 
 APPRISE_NOTIFICATION_TITLE="New BirdNET-Pi Detection"
-APPRISE_NOTIFICATION_BODY="A \$comname (\$sciname)  was just detected with a confidence of \$confidence"
+APPRISE_NOTIFICATION_BODY="A \$comname (\$sciname)  was just detected with a confidence of \$confidence (\$reason)"
 APPRISE_NOTIFY_EACH_DETECTION=0
 APPRISE_NOTIFY_NEW_SPECIES=0
 APPRISE_WEEKLY_REPORT=1
