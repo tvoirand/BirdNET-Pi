@@ -281,7 +281,7 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   if($config["BIRDNETPI_URL"] != "") {
     $filename = $config["BIRDNETPI_URL"]."?filename=".$filename;
   } else{
-    $filename = "http://birdnetpi.local/"."?filename=".$filename;
+    $filename = "http://".$_SERVER['SERVER_NAME']."/"."?filename=".$filename;
   }
 
   $attach="";
