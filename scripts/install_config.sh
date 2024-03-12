@@ -94,6 +94,9 @@ BIRDNETPI_URL=
 
 RTSP_STREAM=
 
+## RTSP_STREAM_TO_LIVESTREAM is the index, so 0 means the first stream
+RTSP_STREAM_TO_LIVESTREAM="0"
+
 #-----------------------  Apprise Miscellanous Configuration -------------------#
 
 APPRISE_NOTIFICATION_TITLE="New BirdNET-Pi Detection"
