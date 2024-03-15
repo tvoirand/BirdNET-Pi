@@ -6,26 +6,15 @@ ini_set('user_agent', 'PHP_Flickr/1.0');
 session_set_cookie_params(7200);
 session_start();
 require_once 'scripts/common.php';
+$home = get_home();
+$config = get_config();
 
-if(!isset($_SESSION['my_timezone'])) {
-  $_SESSION['my_timezone'] = trim(shell_exec('timedatectl show --value --property=Timezone'));
-}
-date_default_timezone_set($_SESSION['my_timezone']);
+set_timezone();
 $myDate = date('Y-m-d');
 $chart = "Combo-$myDate.png";
 
 $db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
 $db->busyTimeout(1000);
-
-if (file_exists('./scripts/thisrun.txt')) {
-  $config = parse_ini_file('./scripts/thisrun.txt');
-} elseif (file_exists('./scripts/firstrun.ini')) {
-  $config = parse_ini_file('./scripts/firstrun.ini');
-}
-
-$user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-$home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-$home = trim($home);
 
 $statement2 = $db->prepare('SELECT COUNT(*) FROM detections WHERE Date == DATE(\'now\', \'localtime\')');
 ensure_db_ok($statement2);
@@ -47,30 +36,13 @@ if(isset($_GET['custom_image'])){
 }
 
 if(isset($_GET['blacklistimage'])) {
-  if(isset($_SERVER['PHP_AUTH_USER'])) {
-    $submittedpwd = $_SERVER['PHP_AUTH_PW'];
-    $submitteduser = $_SERVER['PHP_AUTH_USER'];
-    if($submittedpwd == $config['CADDY_PWD'] && $submitteduser == 'birdnet'){
-
-      $imageid = $_GET['blacklistimage'];
-      $file_handle = fopen($home."/BirdNET-Pi/scripts/blacklisted_images.txt", 'a+');
-      fwrite($file_handle, $imageid . "\n");
-      fclose($file_handle);
-      unset($_SESSION['images']);
-      die("OK");
-    } else {
-      header('WWW-Authenticate: Basic realm="My Realm"');
-      header('HTTP/1.0 401 Unauthorized');
-      echo 'You must be authenticated.';
-      exit;
-    }
-  } else {
-    header('WWW-Authenticate: Basic realm="My Realm"');
-    header('HTTP/1.0 401 Unauthorized');
-    echo 'You must be authenticated.';
-    exit;
-  }
-
+  ensure_authenticated('You must be authenticated.');
+  $imageid = $_GET['blacklistimage'];
+  $file_handle = fopen($home."/BirdNET-Pi/scripts/blacklisted_images.txt", 'a+');
+  fwrite($file_handle, $imageid . "\n");
+  fclose($file_handle);
+  unset($_SESSION['images']);
+  die("OK");
 }
 
 if(isset($_GET['fetch_chart_string']) && $_GET['fetch_chart_string'] == "true") {
