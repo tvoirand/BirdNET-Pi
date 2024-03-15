@@ -2,44 +2,22 @@
 ini_set('display_errors', 1);
 error_reporting(E_ERROR);
 
-if (file_exists('./scripts/thisrun.txt')) {
-  $config = parse_ini_file('./scripts/thisrun.txt');
-} elseif (file_exists('firstrun.ini')) {
-  $config = parse_ini_file('firstrun.ini');
-}
+require_once "scripts/common.php";
+$home = get_home();
+$config = get_config();
 
-$caddypwd = $config['CADDY_PWD'];
-if (!isset($_SERVER['PHP_AUTH_USER'])) {
-  header('WWW-Authenticate: Basic realm="My Realm"');
-  header('HTTP/1.0 401 Unauthorized');
-  echo '<table><tr><td>You cannot edit the settings for this installation</td></tr></table>';
-  exit;
-} else {
-  $submittedpwd = $_SERVER['PHP_AUTH_PW'];
-  $submitteduser = $_SERVER['PHP_AUTH_USER'];
-  if($submittedpwd !== $caddypwd || $submitteduser !== 'birdnet'){
-    header('WWW-Authenticate: Basic realm="My Realm"');
-    header('HTTP/1.0 401 Unauthorized');
-    echo '<table><tr><td>You cannot edit the settings for this installation</td></tr></table>';
-    exit;
-  }
-}
+ensure_authenticated();
 
 if(isset($_GET['submit'])) {
   $contents = file_get_contents('/etc/birdnet/birdnet.conf');
-  $contents2 = file_get_contents('./scripts/thisrun.txt');
-  $restart_livestream = False;
+  $restart_livestream = false;
+  $update_caddyfile = false;
 
   if(isset($_GET["caddy_pwd"])) {
     $caddy_pwd = $_GET["caddy_pwd"];
     if(strcmp($caddy_pwd,$config['CADDY_PWD']) !== 0) {
       $contents = preg_replace("/CADDY_PWD=.*/", "CADDY_PWD=\"$caddy_pwd\"", $contents);
-      $contents2 = preg_replace("/CADDY_PWD=.*/", "CADDY_PWD=\"$caddy_pwd\"", $contents2);
-      $fh = fopen('/etc/birdnet/birdnet.conf', "w");
-      $fh2 = fopen("./scripts/thisrun.txt", "w");
-      fwrite($fh, $contents);
-      fwrite($fh2, $contents2);
-      exec('sudo /usr/local/bin/update_caddyfile.sh > /dev/null 2>&1 &');
+      $update_caddyfile = true;
     }
   }
 
@@ -47,7 +25,7 @@ if(isset($_GET['submit'])) {
     $ice_pwd = $_GET["ice_pwd"];
     if(strcmp($ice_pwd,$config['ICE_PWD']) !== 0) {
       $contents = preg_replace("/ICE_PWD=.*/", "ICE_PWD=$ice_pwd", $contents);
-      $contents2 = preg_replace("/ICE_PWD=.*/", "ICE_PWD=$ice_pwd", $contents2);
+      $restart_livestream = true;
     }
   }
 
@@ -57,12 +35,7 @@ if(isset($_GET['submit'])) {
     $birdnetpi_url = rtrim($birdnetpi_url, '/');
     if(strcmp($birdnetpi_url,$config['BIRDNETPI_URL']) !== 0) {
       $contents = preg_replace("/BIRDNETPI_URL=.*/", "BIRDNETPI_URL=$birdnetpi_url", $contents);
-      $contents2 = preg_replace("/BIRDNETPI_URL=.*/", "BIRDNETPI_URL=$birdnetpi_url", $contents2);
-      $fh = fopen('/etc/birdnet/birdnet.conf', "w");
-      $fh2 = fopen("./scripts/thisrun.txt", "w");
-      fwrite($fh, $contents);
-      fwrite($fh2, $contents2);
-      exec('sudo /usr/local/bin/update_caddyfile.sh > /dev/null 2>&1 &');
+      $update_caddyfile = true;
     }
   }
 
@@ -70,7 +43,6 @@ if(isset($_GET['submit'])) {
     $rtsp_stream = str_replace("\r\n", ",", $_GET["rtsp_stream"]);
     if(strcmp($rtsp_stream,$config['RTSP_STREAM']) !== 0) {
       $contents = preg_replace("/RTSP_STREAM=.*/", "RTSP_STREAM=\"$rtsp_stream\"", $contents);
-      $contents2 = preg_replace("/RTSP_STREAM=.*/", "RTSP_STREAM=\"$rtsp_stream\"", $contents2);
       $restart_livestream = True;
     }
   }
@@ -81,7 +53,6 @@ if(isset($_GET['submit'])) {
     //Setting exists already, see if the value changed
     if (strcmp($rtsp_stream_selected, $config['RTSP_STREAM_TO_LIVESTREAM']) !== 0) {
       $contents = preg_replace("/RTSP_STREAM_TO_LIVESTREAM=.*/", "RTSP_STREAM_TO_LIVESTREAM=\"$rtsp_stream_selected\"", $contents);
-      $contents2 = preg_replace("/RTSP_STREAM_TO_LIVESTREAM=.*/", "RTSP_STREAM_TO_LIVESTREAM=\"$rtsp_stream_selected\"", $contents2);
       $restart_livestream = True;
     }
   }
@@ -92,7 +63,6 @@ if(isset($_GET['submit'])) {
     //Setting exists already, see if the value changed
     if (strcmp($activate_freqshift_in_livestream, $config['ACTIVATE_FREQSHIFT_IN_LIVESTREAM']) !== 0) {
       $contents = preg_replace("/ACTIVATE_FREQSHIFT_IN_LIVESTREAM=.*/", "ACTIVATE_FREQSHIFT_IN_LIVESTREAM=\"$activate_freqshift_in_livestream\"", $contents);
-      $contents2 = preg_replace("/ACTIVATE_FREQSHIFT_IN_LIVESTREAM=.*/", "ACTIVATE_FREQSHIFT_IN_LIVESTREAM=\"$activate_freqshift_in_livestream\"", $contents2);
       $restart_livestream = True;
     }
   }
@@ -101,7 +71,6 @@ if(isset($_GET['submit'])) {
     $overlap = $_GET["overlap"];
     if(strcmp($overlap,$config['OVERLAP']) !== 0) {
       $contents = preg_replace("/OVERLAP=.*/", "OVERLAP=$overlap", $contents);
-      $contents2 = preg_replace("/OVERLAP=.*/", "OVERLAP=$overlap", $contents2);
     }
   }
 
@@ -109,7 +78,6 @@ if(isset($_GET['submit'])) {
     $confidence = $_GET["confidence"];
     if(strcmp($confidence,$config['CONFIDENCE']) !== 0) {
       $contents = preg_replace("/CONFIDENCE=.*/", "CONFIDENCE=$confidence", $contents);
-      $contents2 = preg_replace("/CONFIDENCE=.*/", "CONFIDENCE=$confidence", $contents2);
     }
   }
 
@@ -117,7 +85,6 @@ if(isset($_GET['submit'])) {
     $sensitivity = $_GET["sensitivity"];
     if(strcmp($sensitivity,$config['SENSITIVITY']) !== 0) {
       $contents = preg_replace("/SENSITIVITY=.*/", "SENSITIVITY=$sensitivity", $contents);
-      $contents2 = preg_replace("/SENSITIVITY=.*/", "SENSITIVITY=$sensitivity", $contents2);
     }
   }
 
@@ -125,7 +92,6 @@ if(isset($_GET['submit'])) {
     $freqshift_hi = $_GET["freqshift_hi"];
     if(strcmp($freqshift_hi,$config['FREQSHIFT_HI']) !== 0) {
       $contents = preg_replace("/FREQSHIFT_HI=.*/", "FREQSHIFT_HI=$freqshift_hi", $contents);
-      $contents2 = preg_replace("/FREQSHIFT_HI=.*/", "FREQSHIFT_HI=$freqshift_hi", $contents2);
     }
   }
 
@@ -133,7 +99,6 @@ if(isset($_GET['submit'])) {
     $freqshift_lo = $_GET["freqshift_lo"];
     if(strcmp($freqshift_lo,$config['FREQSHIFT_LO']) !== 0) {
       $contents = preg_replace("/FREQSHIFT_LO=.*/", "FREQSHIFT_LO=$freqshift_lo", $contents);
-      $contents2 = preg_replace("/FREQSHIFT_LO=.*/", "FREQSHIFT_LO=$freqshift_lo", $contents2);
     }
   }
 
@@ -141,7 +106,6 @@ if(isset($_GET['submit'])) {
     $freqshift_pitch = $_GET["freqshift_pitch"];
     if(strcmp($freqshift_pitch,$config['FREQSHIFT_PITCH']) !== 0) {
       $contents = preg_replace("/FREQSHIFT_PITCH=.*/", "FREQSHIFT_PITCH=$freqshift_pitch", $contents);
-      $contents2 = preg_replace("/FREQSHIFT_PITCH=.*/", "FREQSHIFT_PITCH=$freqshift_pitch", $contents2);
     }
   }
 
@@ -149,7 +113,6 @@ if(isset($_GET['submit'])) {
     $freqshift_tool = $_GET["freqshift_tool"];
     if(strcmp($freqshift_tool,$config['FREQSHIFT_TOOL']) !== 0) {
       $contents = preg_replace("/FREQSHIFT_TOOL=.*/", "FREQSHIFT_TOOL=$freqshift_tool", $contents);
-      $contents2 = preg_replace("/FREQSHIFT_TOOL=.*/", "FREQSHIFT_TOOL=$freqshift_tool", $contents2);
     }
   }
 
@@ -157,7 +120,6 @@ if(isset($_GET['submit'])) {
     $freqshift_reconnect_delay = $_GET["freqshift_reconnect_delay"];
     if(strcmp($freqshift_hi,$config['FREQSHIFT_RECONNECT_DELAY']) !== 0) {
       $contents = preg_replace("/FREQSHIFT_RECONNECT_DELAY=.*/", "FREQSHIFT_RECONNECT_DELAY=$freqshift_reconnect_delay", $contents);
-      $contents2 = preg_replace("/FREQSHIFT_RECONNECT_DELAY=.*/", "FREQSHIFT_RECONNECT_DELAY=$freqshift_reconnect_delay", $contents2);
     }
   }
 
@@ -165,7 +127,6 @@ if(isset($_GET['submit'])) {
     $full_disk = $_GET["full_disk"];
     if(strcmp($full_disk,$config['FULL_DISK']) !== 0) {
       $contents = preg_replace("/FULL_DISK=.*/", "FULL_DISK=$full_disk", $contents);
-      $contents2 = preg_replace("/FULL_DISK=.*/", "FULL_DISK=$full_disk", $contents2);
     }
   }
 
@@ -173,7 +134,6 @@ if(isset($_GET['submit'])) {
     $privacy_threshold = $_GET["privacy_threshold"];
     if(strcmp($privacy_threshold,$config['PRIVACY_THRESHOLD']) !== 0) {
       $contents = preg_replace("/PRIVACY_THRESHOLD=.*/", "PRIVACY_THRESHOLD=$privacy_threshold", $contents);
-      $contents2 = preg_replace("/PRIVACY_THRESHOLD=.*/", "PRIVACY_THRESHOLD=$privacy_threshold", $contents2);
     }
   }
 
@@ -181,7 +141,6 @@ if(isset($_GET['submit'])) {
     $rec_card = $_GET["rec_card"];
     if(strcmp($rec_card,$config['REC_CARD']) !== 0) {
       $contents = preg_replace("/REC_CARD=.*/", "REC_CARD=\"$rec_card\"", $contents);
-      $contents2 = preg_replace("/REC_CARD=.*/", "REC_CARD=\"$rec_card\"", $contents2);
     }
   }
 
@@ -189,7 +148,6 @@ if(isset($_GET['submit'])) {
     $channels = $_GET["channels"];
     if(strcmp($channels,$config['CHANNELS']) !== 0) {
       $contents = preg_replace("/CHANNELS=.*/", "CHANNELS=$channels", $contents);
-      $contents2 = preg_replace("/CHANNELS=.*/", "CHANNELS=$channels", $contents2);
     }
   }
 
@@ -197,7 +155,6 @@ if(isset($_GET['submit'])) {
     $recording_length = $_GET["recording_length"];
     if(strcmp($recording_length,$config['RECORDING_LENGTH']) !== 0) {
       $contents = preg_replace("/RECORDING_LENGTH=.*/", "RECORDING_LENGTH=$recording_length", $contents);
-      $contents2 = preg_replace("/RECORDING_LENGTH=.*/", "RECORDING_LENGTH=$recording_length", $contents2);
     }
   }
 
@@ -205,7 +162,6 @@ if(isset($_GET['submit'])) {
     $extraction_length = $_GET["extraction_length"];
     if(strcmp($extraction_length,$config['EXTRACTION_LENGTH']) !== 0) {
       $contents = preg_replace("/EXTRACTION_LENGTH=.*/", "EXTRACTION_LENGTH=$extraction_length", $contents);
-      $contents2 = preg_replace("/EXTRACTION_LENGTH=.*/", "EXTRACTION_LENGTH=$extraction_length", $contents2);
     }
   }
 
@@ -213,36 +169,30 @@ if(isset($_GET['submit'])) {
     $audiofmt = $_GET["audiofmt"];
     if(strcmp($audiofmt,$config['AUDIOFMT']) !== 0) {
       $contents = preg_replace("/AUDIOFMT=.*/", "AUDIOFMT=$audiofmt", $contents);
-      $contents2 = preg_replace("/AUDIOFMT=.*/", "AUDIOFMT=$audiofmt", $contents2);
     }
   }
   if(isset($_GET["silence_update_indicator"])) {
     $silence_update_indicator = 1;
     if(strcmp($silence_update_indicator,$config['SILENCE_UPDATE_INDICATOR']) !== 0) {
       $contents = preg_replace("/SILENCE_UPDATE_INDICATOR=.*/", "SILENCE_UPDATE_INDICATOR=$silence_update_indicator", $contents);
-      $contents2 = preg_replace("/SILENCE_UPDATE_INDICATOR=.*/", "SILENCE_UPDATE_INDICATOR=$silence_update_indicator", $contents2);
     }
   } else {
     $contents = preg_replace("/SILENCE_UPDATE_INDICATOR=.*/", "SILENCE_UPDATE_INDICATOR=0", $contents);
-    $contents2 = preg_replace("/SILENCE_UPDATE_INDICATOR=.*/", "SILENCE_UPDATE_INDICATOR=0", $contents2);
   }
 
   if(isset($_GET["raw_spectrogram"])) {
     $raw_spectrogram = 1;
     if(strcmp($RAW_SPECTROGRAM,$config['RAW_SPECTROGRAM']) !== 0) {
       $contents = preg_replace("/RAW_SPECTROGRAM=.*/", "RAW_SPECTROGRAM=$raw_spectrogram", $contents);
-      $contents2 = preg_replace("/RAW_SPECTROGRAM=.*/", "RAW_SPECTROGRAM=$raw_spectrogram", $contents2);
     }
   } else {
     $contents = preg_replace("/RAW_SPECTROGRAM=.*/", "RAW_SPECTROGRAM=0", $contents);
-    $contents2 = preg_replace("/RAW_SPECTROGRAM=.*/", "RAW_SPECTROGRAM=0", $contents2);
   }
 
   if(isset($_GET["custom_image"])) {
     $custom_image = $_GET["custom_image"];
     if(strcmp($custom_image,$config['CUSTOM_IMAGE']) !== 0) {
       $contents = preg_replace("/CUSTOM_IMAGE=.*/", "CUSTOM_IMAGE=$custom_image", $contents);
-      $contents2 = preg_replace("/CUSTOM_IMAGE=.*/", "CUSTOM_IMAGE=$custom_image", $contents2);
     }
   }
 
@@ -250,7 +200,6 @@ if(isset($_GET['submit'])) {
     $custom_image_label = $_GET["custom_image_label"];
     if(strcmp($custom_image_label,$config['CUSTOM_IMAGE_TITLE']) !== 0) {
       $contents = preg_replace("/CUSTOM_IMAGE_TITLE=.*/", "CUSTOM_IMAGE_TITLE=\"$custom_image_label\"", $contents);
-      $contents2 = preg_replace("/CUSTOM_IMAGE_TITLE=.*/", "CUSTOM_IMAGE_TITLE=\"$custom_image_label\"", $contents2);
     }
   }
 
@@ -258,21 +207,18 @@ if(isset($_GET['submit'])) {
     $birdnet_recording_service_log_level = trim($_GET["LogLevel_BirdnetRecordingService"]);
 	if (strcmp($birdnet_recording_service_log_level, $config['LogLevel_BirdnetRecordingService']) !== 0) {
 		$contents = preg_replace("/LogLevel_BirdnetRecordingService=.*/", "LogLevel_BirdnetRecordingService=\"$birdnet_recording_service_log_level\"", $contents);
-		$contents2 = preg_replace("/LogLevel_BirdnetRecordingService=.*/", "LogLevel_BirdnetRecordingService=\"$birdnet_recording_service_log_level\"", $contents2);
 	}
   }
   if (isset($_GET["LogLevel_SpectrogramViewerService"])) {
     $spectrogram_viewer_service_log_level = trim($_GET["LogLevel_SpectrogramViewerService"]);
 	if (strcmp($birdnet_recording_service_log_level, $config['LogLevel_BirdnetRecordingService']) !== 0) {
 		$contents = preg_replace("/LogLevel_SpectrogramViewerService=.*/", "LogLevel_BirdnetRecordingService=\"$spectrogram_viewer_service_log_level\"", $contents);
-		$contents2 = preg_replace("/LogLevel_SpectrogramViewerService=.*/", "LogLevel_BirdnetRecordingService=\"$spectrogram_viewer_service_log_level\"", $contents2);
 	}
   }
   if (isset($_GET["LogLevel_LiveAudioStreamService"])) {
     $livestream_audio_service_log_level = trim($_GET["LogLevel_LiveAudioStreamService"]);
 	if (strcmp($birdnet_recording_service_log_level, $config['LogLevel_LiveAudioStreamService']) !== 0) {
 		$contents = preg_replace("/LogLevel_LiveAudioStreamService=.*/", "LogLevel_LiveAudioStreamService=\"$livestream_audio_service_log_level\"", $contents);
-		$contents2 = preg_replace("/LogLevel_LiveAudioStreamService=.*/", "LogLevel_LiveAudioStreamService=\"$livestream_audio_service_log_level\"", $contents2);
 		$restart_livestream = True;
 	}
   }
@@ -280,19 +226,18 @@ if(isset($_GET['submit'])) {
   //Finally write the data out. some sections do this themselves in order to have the new settings ready for the services that will be restarted
   //but will doubly ensure the settings are saved after any modification
   $fh = fopen('/etc/birdnet/birdnet.conf', "w");
-  $fh2 = fopen("./scripts/thisrun.txt", "w");
   fwrite($fh, $contents);
-  fwrite($fh2, $contents2);
+  $config = get_config($force_reload=true);
 
   syslog(LOG_INFO, "Restarting Services");
+  if ($update_caddyfile){
+      exec('sudo /usr/local/bin/update_caddyfile.sh > /dev/null 2>&1 &');
+  }
   shell_exec("sudo restart_services.sh");
   if ($restart_livestream) {
     exec("sudo systemctl restart livestream.service");
   }
 }
-
-$user = trim(shell_exec("awk -F: '/1000/{print $1}' /etc/passwd"));
-$home = trim(shell_exec("awk -F: '/1000/{print $6}' /etc/passwd"));
 
 $count_labels = count(file($home."/BirdNET-Pi/model/labels.txt"));
 $count = $count_labels;
@@ -304,11 +249,7 @@ $count = $count_labels;
 <div class="settings">
 
 <?php
-if (file_exists('./scripts/thisrun.txt')) {
-  $newconfig = parse_ini_file('./scripts/thisrun.txt');
-} elseif (file_exists('./scripts/firstrun.ini')) {
-  $newconfig = parse_ini_file('./scripts/firstrun.ini');
-}
+$newconfig = get_config();
 ?>
       <div class="brbanner"><h1>Advanced Settings</h1></div><br>
     <form action="" method="GET">

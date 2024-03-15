@@ -1,38 +1,18 @@
 <?php
 error_reporting(E_ERROR);
 ini_set('display_errors',1);
-if(!isset($_SESSION['my_timezone'])) {
-  $_SESSION['my_timezone'] = trim(shell_exec('timedatectl show --value --property=Timezone'));
-}
-date_default_timezone_set($_SESSION['my_timezone']);
-$user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-$home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-$home = trim($home);
-if (file_exists($home.'/BirdNET-Pi/scripts/thisrun.txt')) {
-  $config = parse_ini_file($home.'/BirdNET-Pi/scripts/thisrun.txt');
-} elseif (file_exists($home.'/BirdNET-Pi/scripts/thisrun.ini')) {
-  $config = parse_ini_file($home.'/BirdNET-Pi/scripts/thisrun.ini');
-}
+require_once "scripts/common.php";
+$user = get_user();
+$home = get_home();
+$config = get_config();
+set_timezone();
+
+ensure_authenticated();
+
 if (file_exists($home."/BirdNET-Pi/apprise.txt")) {
   $apprise_config = file_get_contents($home."/BirdNET-Pi/apprise.txt");
 } else {
   $apprise_config = "";
-}
-$caddypwd = $config['CADDY_PWD'];
-if (!isset($_SERVER['PHP_AUTH_USER'])) {
-  header('WWW-Authenticate: Basic realm="My Realm"');
-  header('HTTP/1.0 401 Unauthorized');
-  echo '<table><tr><td>You cannot edit the settings for this installation</td></tr></table>';
-  exit;
-} else {
-  $submittedpwd = $_SERVER['PHP_AUTH_PW'];
-  $submitteduser = $_SERVER['PHP_AUTH_USER'];
-  if($submittedpwd !== $caddypwd || $submitteduser !== 'birdnet'){
-    header('WWW-Authenticate: Basic realm="My Realm"');
-    header('HTTP/1.0 401 Unauthorized');
-    echo '<table><tr><td>You cannot edit the settings for this installation</td></tr></table>';
-    exit;
-  }
 }
 
 function syslog_shell_exec($cmd, $sudo_user = null) {
@@ -51,9 +31,6 @@ if(isset($_GET['threshold'])) {
   if (!is_numeric($threshold) || $threshold < 0 || $threshold > 1) {
     die('Invalid threshold value');
   }
-
-  $user = trim(shell_exec("awk -F: '/1000/{print $1}' /etc/passwd"));
-  $home = trim(shell_exec("awk -F: '/1000/{print $6}' /etc/passwd"));
 
   $command = "sudo -u $user ".$home."/BirdNET-Pi/birdnet/bin/python3 ".$home."/BirdNET-Pi/scripts/species.py --threshold $threshold 2>&1";
 
@@ -144,17 +121,8 @@ if(isset($_GET["latitude"])){
       sleep(3);
     }
   }
-
-  if (file_exists($home.'/BirdNET-Pi/scripts/thisrun.txt')) {
-    $lang_config = parse_ini_file($home.'/BirdNET-Pi/scripts/thisrun.txt');
-  } elseif (file_exists($home.'/BirdNET-Pi/scripts/thisrun.ini')) {
-    $lang_config = parse_ini_file($home.'/BirdNET-Pi/scripts/thisrun.ini');
-  }
-
-  if ($model != $lang_config['MODEL'] || $language != $lang_config['DATABASE_LANG']){
+  if ($model != $config['MODEL'] || $language != $config['DATABASE_LANG']){
     if(strlen($language) == 2){
-      $user = trim(shell_exec("awk -F: '/1000/{print $1}' /etc/passwd"));
-      $home = trim(shell_exec("awk -F: '/1000/{print $6}' /etc/passwd"));
 
       // Archive old language file
       syslog_shell_exec("cp -f $home/BirdNET-Pi/model/labels.txt $home/BirdNET-Pi/model/labels.txt.old", $user);
@@ -192,29 +160,6 @@ if(isset($_GET["latitude"])){
   $contents = preg_replace("/APPRISE_ONLY_NOTIFY_SPECIES_NAMES=.*/", "APPRISE_ONLY_NOTIFY_SPECIES_NAMES=\"$only_notify_species_names\"", $contents);
   $contents = preg_replace("/APPRISE_ONLY_NOTIFY_SPECIES_NAMES_2=.*/", "APPRISE_ONLY_NOTIFY_SPECIES_NAMES_2=\"$only_notify_species_names_2\"", $contents);
 
-  $contents2 = file_get_contents($home."/BirdNET-Pi/scripts/thisrun.txt");
-  $contents2 = preg_replace("/SITE_NAME=.*/", "SITE_NAME=\"$site_name\"", $contents2);
-  $contents2 = preg_replace("/LATITUDE=.*/", "LATITUDE=$latitude", $contents2);
-  $contents2 = preg_replace("/LONGITUDE=.*/", "LONGITUDE=$longitude", $contents2);
-  $contents2 = preg_replace("/BIRDWEATHER_ID=.*/", "BIRDWEATHER_ID=$birdweather_id", $contents2);
-  $contents2 = preg_replace("/APPRISE_NOTIFICATION_TITLE=.*/", "APPRISE_NOTIFICATION_TITLE=\"$apprise_notification_title\"", $contents2);
-  $contents2 = preg_replace("/APPRISE_NOTIFICATION_BODY=.*/", "APPRISE_NOTIFICATION_BODY=\"$apprise_notification_body\"", $contents2);
-  $contents2 = preg_replace("/APPRISE_NOTIFY_EACH_DETECTION=.*/", "APPRISE_NOTIFY_EACH_DETECTION=$apprise_notify_each_detection", $contents2);
-  $contents2 = preg_replace("/APPRISE_NOTIFY_NEW_SPECIES=.*/", "APPRISE_NOTIFY_NEW_SPECIES=$apprise_notify_new_species", $contents2);
-  $contents2 = preg_replace("/APPRISE_NOTIFY_NEW_SPECIES_EACH_DAY=.*/", "APPRISE_NOTIFY_NEW_SPECIES_EACH_DAY=$apprise_notify_new_species_each_day", $contents2);
-  $contents2 = preg_replace("/APPRISE_WEEKLY_REPORT=.*/", "APPRISE_WEEKLY_REPORT=$apprise_weekly_report", $contents2);
-  $contents2 = preg_replace("/FLICKR_API_KEY=.*/", "FLICKR_API_KEY=$flickr_api_key", $contents2);
-  $contents2 = preg_replace("/DATABASE_LANG=.*/", "DATABASE_LANG=$language", $contents2);
-  $contents2 = preg_replace("/FLICKR_FILTER_EMAIL=.*/", "FLICKR_FILTER_EMAIL=$flickr_filter_email", $contents2);
-  $contents2 = preg_replace("/APPRISE_MINIMUM_SECONDS_BETWEEN_NOTIFICATIONS_PER_SPECIES=.*/", "APPRISE_MINIMUM_SECONDS_BETWEEN_NOTIFICATIONS_PER_SPECIES=$minimum_time_limit", $contents2);
-  $contents2 = preg_replace("/MODEL=.*/", "MODEL=$model", $contents2);
-  $contents2 = preg_replace("/SF_THRESH=.*/", "SF_THRESH=$sf_thresh", $contents2);
-  $contents2 = preg_replace("/DATA_MODEL_VERSION=.*/", "DATA_MODEL_VERSION=$data_model_version", $contents2);
-  $contents2 = preg_replace("/APPRISE_ONLY_NOTIFY_SPECIES_NAMES=.*/", "APPRISE_ONLY_NOTIFY_SPECIES_NAMES=\"$only_notify_species_names\"", $contents2);
-  $contents2 = preg_replace("/APPRISE_ONLY_NOTIFY_SPECIES_NAMES_2=.*/", "APPRISE_ONLY_NOTIFY_SPECIES_NAMES_2=\"$only_notify_species_names_2\"", $contents2);
-
-
-
   if($site_name != $config["SITE_NAME"]) {
     echo "<script>setTimeout(
     function() {
@@ -223,15 +168,9 @@ if(isset($_GET["latitude"])){
   }
 
   $fh = fopen("/etc/birdnet/birdnet.conf", "w");
-  $fh2 = fopen($home."/BirdNET-Pi/scripts/thisrun.txt", "w");
   fwrite($fh, $contents);
-  fwrite($fh2, $contents2);
 
   if(isset($apprise_input)){
-    $user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-    $home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-    $home = trim($home);
-
     $appriseconfig = fopen($home."/BirdNET-Pi/apprise.txt", "w");
     fwrite($appriseconfig, $apprise_input);
     $apprise_config = $apprise_input;
@@ -242,15 +181,6 @@ if(isset($_GET["latitude"])){
 }
 
 if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
-  $user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-  $home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-  $home = trim($home);
-  if (file_exists($home.'/BirdNET-Pi/scripts/thisrun.txt')) {
-    $config = parse_ini_file($home.'/BirdNET-Pi/scripts/thisrun.txt');
-  } elseif (file_exists($home.'/BirdNET-Pi/scripts/thisrun.ini')) {
-    $config = parse_ini_file($home.'/BirdNET-Pi/scripts/thisrun.ini');
-  }
-
   $db = new SQLite3($home."/BirdNET-Pi/scripts/birds.db", SQLITE3_OPEN_READONLY);
   $db->busyTimeout(1000);
 
@@ -335,11 +265,7 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
 }
 
 // have to get the config again after we change the variables, so the UI reflects the changes too
-if (file_exists($home.'/BirdNET-Pi/scripts/thisrun.txt')) {
-  $config = parse_ini_file($home.'/BirdNET-Pi/scripts/thisrun.txt');
-} elseif (file_exists($home.'/BirdNET-Pi/scripts/thisrun.ini')) {
-  $config = parse_ini_file($home.'/BirdNET-Pi/scripts/thisrun.ini');
-}
+$config = get_config($force_reload=true);
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
