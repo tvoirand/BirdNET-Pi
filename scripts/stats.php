@@ -8,6 +8,7 @@ ini_set('user_agent', 'PHP_Flickr/1.0');
 error_reporting(0);
 ini_set('display_errors', 0);
 require_once 'scripts/common.php';
+$home = get_home();
 
 $db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
 $db->busyTimeout(1000);
@@ -41,9 +42,6 @@ if(isset($_GET['species'])){
   $result3 = $statement3->execute();
 }
 
-$user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-$home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-$home = trim($home);
 if(!file_exists($home."/BirdNET-Pi/scripts/disk_check_exclude.txt") || strpos(file_get_contents($home."/BirdNET-Pi/scripts/disk_check_exclude.txt"),"##start") === false) {
   file_put_contents($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", "");
   file_put_contents($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", "##start\n##end\n");
@@ -192,11 +190,8 @@ while($results=$result3->fetchArray(SQLITE3_ASSOC)){
   
   ob_flush();
   flush();
-  if (file_exists('./scripts/thisrun.txt')) {
-    $config = parse_ini_file('./scripts/thisrun.txt');
-  } elseif (file_exists('./scripts/firstrun.ini')) {
-    $config = parse_ini_file('./scripts/firstrun.ini');
-  }
+  $config = get_config();
+
   if (! empty($config["FLICKR_API_KEY"])) {
     // only open the file once per script execution
     if(!isset($lines)) {

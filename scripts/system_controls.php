@@ -1,9 +1,9 @@
 <?php
 session_start();
-$user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-$user = trim($user);
-$home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-$home = trim($home);
+require_once "scripts/common.php";
+$user = get_user();
+$home = get_home();
+
 $fetch = shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi fetch 2>&1");
 $str = trim(shell_exec("sudo -u".$user." git -C ".$home."/BirdNET-Pi status"));
 if (preg_match("/behind '.*?' by (\d+) commit(s?)\b/", $str, $matches)) {

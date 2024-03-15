@@ -1,7 +1,9 @@
 <?php
-$home = trim(shell_exec("awk -F: '/1000/{print $6}' /etc/passwd"));
+require_once "scripts/common.php";
+$home = get_home();
+
 function do_service_mount($action) {
-  echo "value=\"sudo systemctl ".$action." ".service_mount()." && sudo reboot\"";
+  echo "value=\"sudo systemctl ".$action." ".get_service_mount_name()." && sudo reboot\"";
 }
 function service_status($name) {
   global $home;
@@ -81,7 +83,7 @@ function service_status($name) {
     <button type="submit" name="submit" value="sudo systemctl enable --now spectrogram_viewer.service">Enable</button>
   </form>
   <form action="" method="GET">
-    <h3>Ram drive (!experimental!) <?php echo service_status(service_mount());?></h3>
+    <h3>Ram drive (!experimental!) <?php echo service_status(get_service_mount_name());?></h3>
     <button type="submit" name="submit" <?php do_service_mount("disable");?> onclick="return confirm('This will reboot, are you sure?')">Disable</button>
     <button type="submit" name="submit" <?php do_service_mount("enable");?> onclick="return confirm('This will reboot, are you sure?')">Enable</button>
   </form>
