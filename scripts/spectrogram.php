@@ -2,11 +2,9 @@
 error_reporting(E_ERROR);
 ini_set('display_errors',1);
 
-if (file_exists('./scripts/thisrun.txt')) {
-	$config = parse_ini_file('./scripts/thisrun.txt');
-} elseif (file_exists('./scripts/firstrun.ini')) {
-	$config = parse_ini_file('./scripts/firstrun.ini');
-}
+require_once "scripts/common.php";
+$home = get_home();
+$config = get_config();
 
 if(!empty($config['FREQSHIFT_RECONNECT_DELAY']) && is_numeric($config['FREQSHIFT_RECONNECT_DELAY'])){
     $FREQSHIFT_RECONNECT_DELAY = ($config['FREQSHIFT_RECONNECT_DELAY']);
@@ -16,11 +14,6 @@ if(!empty($config['FREQSHIFT_RECONNECT_DELAY']) && is_numeric($config['FREQSHIFT
 
 if(isset($_GET['ajax_csv'])) {
   $RECS_DIR = $config["RECS_DIR"];
-
-  $user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-  $home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-  $home = trim($home);
-
   $STREAM_DATA_DIR = $RECS_DIR . "/StreamData/";
 
   if (empty($config['RTSP_STREAM'])) {
@@ -141,11 +134,6 @@ window.onload = function(){
     document.getElementsByClassName("centered")[0].remove()
 
     <?php 
-    if (file_exists('./scripts/thisrun.txt')) {
-    $config = parse_ini_file('./scripts/thisrun.txt');
-  } elseif (file_exists('./scripts/firstrun.ini')) {
-    $config = parse_ini_file('./scripts/firstrun.ini');
-  }
   $refresh = $config['RECORDING_LENGTH'];
   $time = time();
   ?>
@@ -432,13 +420,10 @@ h1 {
                 //This isn't the ideal for this, but needed a way to fix this setting without calling the advanced setting page
 				if (array_key_exists($config['RTSP_STREAM_TO_LIVESTREAM'], $RTSP_Stream_Config) === false) {
 					$contents = file_get_contents('/etc/birdnet/birdnet.conf');
-					$contents2 = file_get_contents('./scripts/thisrun.txt');
 					$contents = preg_replace("/RTSP_STREAM_TO_LIVESTREAM=.*/", "RTSP_STREAM_TO_LIVESTREAM=\"0\"", $contents);
-					$contents2 = preg_replace("/RTSP_STREAM_TO_LIVESTREAM=.*/", "RTSP_STREAM_TO_LIVESTREAM=\"0\"", $contents2);
 					$fh = fopen("/etc/birdnet/birdnet.conf", "w");
-					$fh2 = fopen("./scripts/thisrun.txt", "w");
 					fwrite($fh, $contents);
-					fwrite($fh2, $contents2);
+					get_config($force_reload=true);
 					exec("sudo systemctl restart livestream.service");
 				}
 
