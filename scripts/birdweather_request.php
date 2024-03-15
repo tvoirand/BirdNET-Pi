@@ -1,9 +1,6 @@
 <?php
-if (file_exists('thisrun.txt')) {
-  $config = parse_ini_file('thisrun.txt');
-} elseif (file_exists('firstrun.ini')) {
-  $config = parse_ini_file('firstrun.ini');
-} 
+require_once 'scripts/common.php';
+$config = get_config();
 $template = file_get_contents("./scripts/email_template");
 
 foreach($config as $key => $value)
