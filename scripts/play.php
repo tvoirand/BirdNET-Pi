@@ -7,126 +7,63 @@ $_POST  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 error_reporting(E_ERROR);
 ini_set('display_errors',1);
 require_once 'scripts/common.php';
+$home = get_home();
+$config = get_config();
 
 $db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
 $db->busyTimeout(1000);
 
-if (file_exists('./scripts/thisrun.txt')) {
-  $config = parse_ini_file('./scripts/thisrun.txt');
-} elseif (file_exists('firstrun.ini')) {
-  $config = parse_ini_file('firstrun.ini');
-}
-
-$user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-$home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-$home = trim($home);
-
-
 if(isset($_GET['deletefile'])) {
-  if(isset($_SERVER['PHP_AUTH_USER'])) {
-    $submittedpwd = $_SERVER['PHP_AUTH_PW'];
-    $submitteduser = $_SERVER['PHP_AUTH_USER'];
-    if($submittedpwd == $config['CADDY_PWD'] && $submitteduser == 'birdnet'){
-      $db_writable = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READWRITE);
-      $db->busyTimeout(1000);
-      $statement1 = $db_writable->prepare('DELETE FROM detections WHERE File_Name = :file_name LIMIT 1');
-      ensure_db_ok($statement1);
-      $statement1->bindValue(':file_name', explode("/", $_GET['deletefile'])[2]);
-      $file_pointer = $home."/BirdSongs/Extracted/By_Date/".$_GET['deletefile'];
-      if (!exec("sudo rm $file_pointer && sudo rm $file_pointer.png")) {
-        echo "OK";
-      } else {
-        echo "Error";
-      }
-      $result1 = $statement1->execute();
-      $db_writable->close();
-      die();
-    } else {
-      header('WWW-Authenticate: Basic realm="My Realm"');
-      header('HTTP/1.0 401 Unauthorized');
-      echo 'You must be authenticated to change the protection of files.';
-      exit;
-    }
+  ensure_authenticated('You must be authenticated to delete files.');
+  $db_writable = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READWRITE);
+  $db->busyTimeout(1000);
+  $statement1 = $db_writable->prepare('DELETE FROM detections WHERE File_Name = :file_name LIMIT 1');
+  ensure_db_ok($statement1);
+  $statement1->bindValue(':file_name', explode("/", $_GET['deletefile'])[2]);
+  $file_pointer = $home."/BirdSongs/Extracted/By_Date/".$_GET['deletefile'];
+  if (!exec("sudo rm $file_pointer && sudo rm $file_pointer.png")) {
+    echo "OK";
   } else {
-    header('WWW-Authenticate: Basic realm="My Realm"');
-    header('HTTP/1.0 401 Unauthorized');
-    echo 'You must be authenticated to change the protection of files.';
-    exit;
+    echo "Error";
   }
+  $result1 = $statement1->execute();
+  $db_writable->close();
+  die();
 }
 
 if(isset($_GET['excludefile'])) {
-  if(isset($_SERVER['PHP_AUTH_USER'])) {
-    $submittedpwd = $_SERVER['PHP_AUTH_PW'];
-    $submitteduser = $_SERVER['PHP_AUTH_USER'];
-    if($submittedpwd == $config['CADDY_PWD'] && $submitteduser == 'birdnet'){
-      if(!file_exists($home."/BirdNET-Pi/scripts/disk_check_exclude.txt")) {
-        file_put_contents($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", "##start\n##end\n");
-      }
-      if(isset($_GET['exclude_add'])) {
-        $myfile = fopen($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", "a") or die("Unable to open file!");
-        $txt = $_GET['excludefile'];
-        fwrite($myfile, $txt."\n");
-        fwrite($myfile, $txt.".png\n");
-        fclose($myfile);
-        echo "OK";
-        die();
-      } else {
-        $lines  = file($home."/BirdNET-Pi/scripts/disk_check_exclude.txt");
-        $search = $_GET['excludefile'];
-
-        $result = '';
-        foreach($lines as $line) {
-          if(stripos($line, $search) === false && stripos($line, $search.".png") === false) {
-            $result .= $line;
-          }
-        }
-        file_put_contents($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", $result);
-        echo "OK";
-        die();
-      }
-    } else {
-      header('WWW-Authenticate: Basic realm="My Realm"');
-      header('HTTP/1.0 401 Unauthorized');
-      echo 'You must be authenticated to change the protection of files.';
-      exit;
-    }
+  ensure_authenticated('You must be authenticated to change the protection of files.');
+  if(!file_exists($home."/BirdNET-Pi/scripts/disk_check_exclude.txt")) {
+    file_put_contents($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", "##start\n##end\n");
+  }
+  if(isset($_GET['exclude_add'])) {
+    $myfile = fopen($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", "a") or die("Unable to open file!");
+    $txt = $_GET['excludefile'];
+    fwrite($myfile, $txt."\n");
+    fwrite($myfile, $txt.".png\n");
+    fclose($myfile);
+    echo "OK";
+    die();
   } else {
-    header('WWW-Authenticate: Basic realm="My Realm"');
-    header('HTTP/1.0 401 Unauthorized');
-    echo 'You must be authenticated to change the protection of files.';
-    exit;
+    $lines  = file($home."/BirdNET-Pi/scripts/disk_check_exclude.txt");
+    $search = $_GET['excludefile'];
+
+    $result = '';
+    foreach($lines as $line) {
+      if(stripos($line, $search) === false && stripos($line, $search.".png") === false) {
+        $result .= $line;
+      }
+    }
+    file_put_contents($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", $result);
+    echo "OK";
+    die();
   }
 }
 
 $shifted_path = $home."/BirdSongs/Extracted/By_Date/shifted/";
 
 if(isset($_GET['shiftfile'])) {
-
-  if (file_exists('./scripts/thisrun.txt')) {
-  $config = parse_ini_file('./scripts/thisrun.txt');
-} elseif (file_exists('./scripts/firstrun.ini')) {
-  $config = parse_ini_file('./scripts/firstrun.ini');
-}
-$user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-$home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-$home = trim($home);
-$caddypwd = $config['CADDY_PWD'];
-if (!isset($_SERVER['PHP_AUTH_USER'])) {
-  header('WWW-Authenticate: Basic realm="My Realm"');
-  header('HTTP/1.0 401 Unauthorized');
-  echo '<table><tr><td>You cannot shift files for this installation</td></tr></table>';
-  exit;
-} else {
-  $submittedpwd = $_SERVER['PHP_AUTH_PW'];
-  $submitteduser = $_SERVER['PHP_AUTH_USER'];
-  if($submittedpwd !== $caddypwd || $submitteduser !== 'birdnet'){
-    header('WWW-Authenticate: Basic realm="My Realm"');
-    header('HTTP/1.0 401 Unauthorized');
-    echo '<table><tr><td>You cannot shift files for this installation<</td></tr></table>';
-    exit;
-  }
-}
+  ensure_authenticated('You cannot shift files for this installation');
 
     $filename = $_GET['shiftfile'];
     $pp = pathinfo($filename);
