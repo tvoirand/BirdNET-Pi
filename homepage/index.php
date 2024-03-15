@@ -3,22 +3,11 @@
 /* Prevent XSS input */
 $_GET   = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
 $_POST  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+require_once 'scripts/common.php';
+$config = get_config();
+$site_name = get_sitename();
+set_timezone();
 
-if(!isset($_SESSION['my_timezone'])) {
-  $_SESSION['my_timezone'] = trim(shell_exec('timedatectl show --value --property=Timezone'));
-}
-date_default_timezone_set($_SESSION['my_timezone']);
-
-  if (file_exists('./scripts/thisrun.txt')) {
-    $config = parse_ini_file('./scripts/thisrun.txt');
-  } elseif (file_exists('./scripts/firstrun.ini')) {
-    $config = parse_ini_file('./scripts/firstrun.ini');
-  }
-  if($config["SITE_NAME"] == "") {
-    $site_name = "BirdNET-Pi";
-  } else {
-    $site_name = $config['SITE_NAME'];
-  }
 ?>
 <title><?php echo $site_name; ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,33 +30,12 @@ echo "<a href=\"https://github.com/Nachtzuster/BirdNET-Pi.git\" target=\"_blank\
   <div class="stream">
 <?php
 if(isset($_GET['stream'])){
-  if (file_exists('./scripts/thisrun.txt')) {
-    $config = parse_ini_file('./scripts/thisrun.txt');
-  } elseif (file_exists('./scripts/firstrun.ini')) {
-    $config = parse_ini_file('./scripts/firstrun.ini');
-  }
-  $caddypwd = $config['CADDY_PWD'];
-  if (!isset($_SERVER['PHP_AUTH_USER'])) {
-    header('WWW-Authenticate: Basic realm="My Realm"');
-    header('HTTP/1.0 401 Unauthorized');
-    echo 'You cannot listen to the live audio stream';
-    exit;
-  } else {
-    $submittedpwd = $_SERVER['PHP_AUTH_PW'];
-    $submitteduser = $_SERVER['PHP_AUTH_USER'];
-    if($submittedpwd == $caddypwd && $submitteduser == 'birdnet'){
+  ensure_authenticated('You cannot listen to the live audio stream');
       echo "
   <audio controls autoplay><source src=\"/stream\"></audio>
   </div>
   <h1><a href=\"/\"><img class=\"topimage\" src=\"images/bnp.png\"></a></h1>
   </div><div class=\"centered\"><h3>$site_name</h3></div>";
-    } else {
-      header('WWW-Authenticate: Basic realm="My Realm"');
-      header('HTTP/1.0 401 Unauthorized');
-      echo 'You cannot listen to the live audio stream';
-      exit;
-    }
-  }
 } else {
     echo "
   <form action=\"\" method=\"GET\">
