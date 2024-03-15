@@ -24,10 +24,12 @@ if (file_exists('./scripts/thisrun.txt')) {
     $site_name = $config['SITE_NAME'];
   }
 
-  if($kiosk == true) {
+if(isset($kiosk) && $kiosk == true) {
     echo "<div style='margin-top:20px' class=\"centered\"><h1><a><img class=\"topimage\" src=\"images/bnp.png\"></a></h1></div>
 </div><div class=\"centered\"><h3>$site_name</h3></div><hr>";
-  }
+} else {
+  $kiosk = false;
+}
 
 $db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
 $db->busyTimeout(1000);
