@@ -8,12 +8,7 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 require_once 'scripts/common.php';
-
-if (file_exists('./scripts/thisrun.txt')) {
-  $config = parse_ini_file('./scripts/thisrun.txt');
-} elseif (file_exists('./scripts/firstrun.ini')) {
-  $config = parse_ini_file('./scripts/firstrun.ini');
-}
+$config = get_config();
 
 if(isset($_GET['date'])){
 $theDate = $_GET['date'];
@@ -37,14 +32,6 @@ if(isset($_GET['blocation']) ) {
 	header("Content-Disposition: attachment; filename=result_file.csv");
 	header("Pragma: no-cache");
 	header("Expires: 0");
-
-
-	$user = trim(shell_exec("awk -F: '/1000/{print $1}' /etc/passwd"));
-	$home = trim(shell_exec("awk -F: '/1000/{print $6}' /etc/passwd"));
-
-
-	//$sunrise = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $config["LATITUDE"], $config["LONGITUDE"]);
-	//$sunset = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, $config["LATITUDE"], $config["LONGITUDE"]);
 
 	$list = array ();
 

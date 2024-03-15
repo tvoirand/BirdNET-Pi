@@ -11,18 +11,9 @@ session_start();
 error_reporting(E_ERROR);
 ini_set('display_errors',1);
 require_once 'scripts/common.php';
-
-if (file_exists('./scripts/thisrun.txt')) {
-    $config = parse_ini_file('./scripts/thisrun.txt');
-  } elseif (file_exists('./scripts/firstrun.ini')) {
-  $config = parse_ini_file('./scripts/firstrun.ini');
-  } 
-
-  if($config["SITE_NAME"] == "") {
-    $site_name = "BirdNET-Pi";
-  } else {
-    $site_name = $config['SITE_NAME'];
-  }
+$home = get_home();
+$config = get_config();
+$site_name = get_sitename();
 
 if(isset($kiosk) && $kiosk == true) {
     echo "<div style='margin-top:20px' class=\"centered\"><h1><a><img class=\"topimage\" src=\"images/bnp.png\"></a></h1></div>
@@ -63,10 +54,6 @@ $statement6 = $db->prepare('SELECT COUNT(DISTINCT(Com_Name)) FROM detections');
 ensure_db_ok($statement6);
 $result6 = $statement6->execute();
 $totalspeciestally = $result6->fetchArray(SQLITE3_ASSOC);
-
-$user = shell_exec("awk -F: '/1000/{print $1}' /etc/passwd");
-$home = shell_exec("awk -F: '/1000/{print $6}' /etc/passwd");
-$home = trim($home);
 
 if(isset($_GET['comname'])) {
  $birdName = $_GET['comname'];
@@ -199,13 +186,6 @@ if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true"  ) {
   $iterations = 0;
   $lines=null;
   $licenses_urls = array();
-
-  if (file_exists('./scripts/thisrun.txt')) {
-    $config = parse_ini_file('./scripts/thisrun.txt');
-  } elseif (file_exists('./scripts/firstrun.ini')) {
-  $config = parse_ini_file('./scripts/firstrun.ini');
-  } 
-
 
   while($todaytable=$result0->fetchArray(SQLITE3_ASSOC))
   {
