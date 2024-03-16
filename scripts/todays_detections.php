@@ -650,6 +650,7 @@ function generateMiniGraph(elem, comname) {
       // Create a div element for the chart window
       if (typeof(window.chartWindow) != 'undefined') {
         document.body.removeChild(window.chartWindow);
+        window.chartWindow = undefined;
       }
       var chartWindow = document.createElement('div');
       chartWindow.className = "chartdiv"
@@ -759,6 +760,7 @@ function generateMiniGraph(elem, comname) {
       closeButton.style.right = '5px';
       closeButton.addEventListener('click', function() {
         document.body.removeChild(chartWindow);
+        window.chartWindow = undefined;
       });
       chartWindow.appendChild(closeButton);
       window.chartWindow = chartWindow;
