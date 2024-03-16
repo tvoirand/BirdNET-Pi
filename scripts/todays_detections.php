@@ -777,6 +777,7 @@ window.addEventListener('scroll', function() {
   // Loop through all chart elements and remove them
   charts.forEach(function(chart) {
     chart.parentNode.removeChild(chart);
+    window.chartWindow = undefined;
   });
 });
 
