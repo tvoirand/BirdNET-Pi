@@ -479,7 +479,7 @@ die();
   }
   </script>  
     <h3>Number of Detections</h3>
-    <div id="todaystats"><table>
+    <div id="todaystats" class="overview"><table>
       <tr>
   <th>Total</th>
   <th>Today</th>
