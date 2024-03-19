@@ -9,8 +9,8 @@
   <input autocomplete="off" size="18" type="text" placeholder="Search Species..." id="exclude_species_searchterm" name="exclude_species_searchterm">
   <br>
   <span>Once the desired species has been highlighted, click it and then click ADD to have it excluded.</span>
-  <select name="species[]" id="species" multiple size="auto">
-  <option>Choose a species below to add to the Excluded Species List</option>
+  <select name="species[]" id="species" multiple size="25">
+  <option selected value="base">Please Select</option>
   <?php
     error_reporting(E_ALL);
     ini_set('display_errors',1);
@@ -40,8 +40,9 @@
 <div class="customlabels column3">
 <form action="" method="GET" id="del">
   <h3>Excluded Species List</h3>
-  <br><br>
-  <select name="species[]" id="value2" multiple size="auto">
+  <br><br><br>
+  <select name="species[]" id="value2" multiple size="25">
+  <option selected value="base">Please Select</option>
 <?php
   $filename = './scripts/exclude_species_list.txt';
   $eachline = file($filename, FILE_IGNORE_NEW_LINES);

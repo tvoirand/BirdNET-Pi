@@ -35,18 +35,21 @@ function update() {
 }
 </script>
 <div class="systemcontrols">
-  <form action="" method="GET">
+<form action="views.php" method="GET">
+  <div>
     <button type="submit" name="submit" value="sudo reboot" onclick="return confirm('Are you sure you want to reboot?')">Reboot</button>
-  </form>
-  <form action="" method="GET">
+  </div>
+  <div>
     <button type="submit" name="submit" id="updatebtn" value="update_birdnet.sh" onclick="update();">Update <?php if(isset($_SESSION['behind']) && $_SESSION['behind'] != "0" && $_SESSION['behind'] != "with"){?><div class="updatenumber"><?php echo $_SESSION['behind']; ?></div><?php } ?></button>
-  </form>
-  <form action="" method="GET">
+  </div>
+  <div>
     <button type="submit" name="submit" value="sudo shutdown now" onclick="return confirm('Are you sure you want to shutdown?')">Shutdown</button>
-  </form>
-  <form action="" method="GET">
+  </div>
+  <div>
     <button type="submit" name="submit" value="sudo clear_all_data.sh" onclick="return confirm('Clear ALL Data? Note that this cannot be undone and will take up to 90 seconds.')">Clear ALL data</button>
-  </form> 
+  </div>
+</form>
+</div>
 <?php
   $cmd="cd ".$home."/BirdNET-Pi && sudo -u ".$user." git rev-list --max-count=1 HEAD";
   $curr_hash = shell_exec($cmd);

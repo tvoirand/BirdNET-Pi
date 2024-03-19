@@ -46,37 +46,39 @@ elseif ($config["LONGITUDE"] == "0.000") {
   echo "<center style='color:red'><b>WARNING: Your longitude is not set properly. Please do so now in Tools -> Settings.</center></b>";
 }
 ?>
+<!DOCTYPE html>
 <link rel="stylesheet" href="style.css?v=<?php echo date ('n.d.y', filemtime('style.css')); ?>">
 <style>
 
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
 <div class="topnav" id="myTopnav">
-<form action="" method="GET" id="views">
+<form action="views.php" method="GET" id="views">
   <button type="submit" name="view" value="Overview" form="views">Overview</button>
 </form>
-<form action="" method="GET" id="views">
+<form action="views.php" method="GET" id="views">
   <button type="submit" name="view" value="Todays Detections" form="views">Today's Detections</button>
 </form>
-<form action="" method="GET" id="views">
+<form action="views.php" method="GET" id="views">
   <button type="submit" name="view" value="Spectrogram" form="views">Spectrogram</button>
 </form>
-<form action="" method="GET" id="views">
+<form action="views.php" method="GET" id="views">
   <button type="submit" name="view" value="Species Stats" form="views">Best Recordings</button>
 </form>
-<form action="" method="GET" id="views">
+<form action="views.php" method="GET" id="views">
   <button type="submit" name="view" value="Streamlit" form="views">Species Stats</button>
 </form>
-<form action="" method="GET" id="views">
+<form action="views.php" method="GET" id="views">
   <button type="submit" name="view" value="Daily Charts" form="views">Daily Charts</button>
 </form>
-<form action="" method="GET" id="views">
+<form action="views.php" method="GET" id="views">
   <button type="submit" name="view" value="Recordings" form="views">Recordings</button>
 </form>
-<form action="" method="GET" id="views">
+<form action="views.php" method="GET" id="views">
   <button type="submit" name="view" value="View Log" form="views">View Log</button>
 </form>
-<form action="" id="toolsbtn" method="GET" id="views">
+<form action="views.php" method="GET" id="views">
   <button type="submit" name="view" value="Tools" form="views">Tools<?php if(isset($_SESSION['behind']) && intval($_SESSION['behind']) >= 50 && ($config['SILENCE_UPDATE_INDICATOR'] != 1)){ $updatediv = ' <div class="updatenumber">'.$_SESSION["behind"].'</div>'; } else { $updatediv = ""; } echo $updatediv; ?></button>
 </form>
 <button href="javascript:void(0);" class="icon" onclick="myFunction()"><img src="images/menu.png"></button>
@@ -142,7 +144,7 @@ if(isset($_GET['view'])){
     ensure_authenticated();
     $url = $_SERVER['SERVER_NAME']."/scripts/adminer.php";
     echo "<div class=\"centered\">
-      <form action=\"\" method=\"GET\" id=\"views\">
+      <form action=\"views.php\" method=\"GET\" id=\"views\">
       <button type=\"submit\" name=\"view\" value=\"Settings\" form=\"views\">Settings</button>
       <button type=\"submit\" name=\"view\" value=\"System Info\" form=\"views\">System Info</button>
       <button type=\"submit\" name=\"view\" value=\"System Controls\" form=\"views\">System Controls".$updatediv."</button>

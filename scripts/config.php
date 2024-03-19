@@ -645,6 +645,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
 
       <input type="hidden" name="status" value="success">
       <input type="hidden" name="submit" value="settings">
+<div class="float">
       <button type="submit" id="basicformsubmit" onclick="if(document.getElementById('basicform').checkValidity()){this.innerHTML = 'Updating... please wait.';this.classList.add('disabled')}" name="view" value="Settings">
 <?php
 if(isset($_GET['status'])){
@@ -653,10 +654,10 @@ if(isset($_GET['status'])){
   echo "Update Settings";
 }
 ?>
-      </button>
+      </button></div>
       </form>
       <form action="" method="GET">
+      <div class="float">
         <button type="submit" name="view" value="Advanced">Advanced Settings</button>
-      </form>
+      </div></form>
 </div>
-

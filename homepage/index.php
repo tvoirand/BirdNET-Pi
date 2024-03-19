@@ -9,6 +9,7 @@ $site_name = get_sitename();
 set_timezone();
 
 ?>
+<!DOCTYPE html>
 <title><?php echo $site_name; ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>

@@ -23,11 +23,10 @@ h3 {
 }
 
 iframe {
-  padding: 0;
-  margin: 0;
   border: none;
-  height: 85%;
+  height: 88%;
   width: 100%;
+  position: fixed;
 }
 
 body {
@@ -169,7 +168,6 @@ button:hover {
   text-align: center;
   padding: 14px 16px;
   width: auto;
-  height: 100%;
   vertical-align: middle;
 }
 
@@ -283,6 +281,14 @@ button:hover {
   padding: 12px;
 }
 
+.settings h2 {
+  margin-top: 0px;
+}
+
+.settings p {
+  margin-bottom: 0px;
+}
+
 .settings h3 {
   text-align: left;
 }
@@ -295,6 +301,11 @@ button:hover {
 .settings button:hover {
   background-color: rgb(159, 226, 155);
   color: black;
+}
+
+.float button {
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
 
 .customlabels,.customlabels2 {
@@ -365,18 +376,33 @@ button:hover {
 }
 
 .systemcontrols form,.servicecontrols form {
-  text-align: center;
+  /*text-align: center;*/
 }
 
-.systemcontrols button,.servicecontrols button {
-  
+.servicecontrols button {
   background-color: rgb(219, 255, 235);
   padding: 12px;
   width: 50%;
 }
 
+.systemcontrols button {
+  background-color: rgb(219, 255, 235);
+  display: block;
+  padding: 12px;
+  width: 50%;
+  margin: 16px auto;
+}
+
 .servicecontrols button {
   width: 20%;
+}
+
+.btn-group-center {
+  text-align:center;
+  /*align-content: center;*/
+  margin: 16px auto;
+  position:relative;
+  /*display:inline-block;*/
 }
 
 .slider {

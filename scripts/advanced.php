@@ -576,6 +576,7 @@ foreach($formats as $format){
         </table>
       <br><br>
       <input type="hidden" name="view" value="Advanced">
+<div class="float">
       <button onclick="if(<?php print($newconfig['PRIVACY_THRESHOLD']);?> != document.getElementById('privacy_threshold').value){return confirm('This will take about 90 seconds.')} collectrtspUrls();" type="submit" name="submit" value="advanced">
 <?php
 if(isset($_GET['submit'])){
@@ -584,10 +585,11 @@ if(isset($_GET['submit'])){
   echo "Update Settings";
 }
 ?>
-      </button>
-      <br>
+      </button></div>
       </form>
       <form action="" method="GET">
+<div class="float">
         <button type="submit" name="view" value="Settings">Basic Settings</button>
+</div>
       </form>
 </div>
