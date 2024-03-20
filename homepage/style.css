@@ -149,7 +149,7 @@ button:hover {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 15px;
-  box-shadow: 0px 0px 28px 1px rgba(0, 0, 0, 0.10); !important;
+  box-shadow: 0px 0px 28px 1px rgba(0, 0, 0, 0.10) !important;
   border-radius: 4px;
 }
 
@@ -172,7 +172,7 @@ button:hover {
 }
 
 .topnav button:hover {
-  background-color: rgb(219, 295, 235);
+  background-color: rgb(219, 255, 235);
   color: black;
 }
 
@@ -182,7 +182,7 @@ button:hover {
 }
 
 .topnav .button-hover {
-  background-color: rgb(219, 295, 235) !important;
+  background-color: rgb(219, 255, 235) !important;
   color: black;
 }
 
