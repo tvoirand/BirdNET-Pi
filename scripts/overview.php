@@ -349,7 +349,7 @@ echo "<img id=\"spectrogramimage\" src=\"/spectrogram.png?nocache=$time\">";
 
 </div>
 </div>
-
+</div>
 <script>
 // we're passing a unique ID of the currently displayed detection to our script, which checks the database to see if the newest detection entry is that ID, or not. If the IDs don't match, it must mean we have a new detection and it's loaded onto the page
 function loadDetectionIfNewExists(previous_detection_identifier=undefined) {
