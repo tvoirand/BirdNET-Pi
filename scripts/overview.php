@@ -265,8 +265,7 @@ $totalspeciestally = $result6->fetchArray(SQLITE3_ASSOC);
   </tr>
   <tr>
     <th>Today</th>
-    
-    <td><form action="" method="GET"><button type="submit" name="view" value="Today's Detections"><?php echo $todaycount['COUNT(*)'];?></button></td>
+    <td><form action="" method="GET"><button type="submit" name="view" value="Todays Detections"><?php echo $todaycount['COUNT(*)'];?></button></td>
     </form>
   </tr>
   <tr>
