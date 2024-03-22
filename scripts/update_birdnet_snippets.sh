@@ -4,9 +4,11 @@ set -x
 trap 'exit 1' SIGINT SIGHUP
 source /etc/birdnet/birdnet.conf
 if [ -n "${BIRDNET_USER}" ]; then
+  echo "BIRDNET_USER: ${BIRDNET_USER}"
   USER=${BIRDNET_USER}
   HOME=/home/${BIRDNET_USER}
 else
+  echo "WARNING: no BIRDNET_USER found"
   USER=$(awk -F: '/1000/ {print $1}' /etc/passwd)
   HOME=$(awk -F: '/1000/ {print $6}' /etc/passwd)
 fi
