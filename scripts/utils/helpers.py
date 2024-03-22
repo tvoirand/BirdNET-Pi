@@ -55,7 +55,7 @@ class Detection:
     def __init__(self, start_time, stop_time, species, confidence):
         self.start = float(start_time)
         self.stop = float(stop_time)
-        self.confidence = float(confidence)
+        self.confidence = round(float(confidence), 4)
         self.confidence_pct = round(self.confidence * 100)
         self.species = species
         self.scientific_name = species.split('_')[0]
