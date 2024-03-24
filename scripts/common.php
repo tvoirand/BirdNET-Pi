@@ -19,6 +19,10 @@ function set_timezone() {
 }
 
 function get_config($force_reload = false) {
+  $mtime = stat('/etc/birdnet/birdnet.conf')["mtime"];
+  if (isset($_SESSION['my_config_version']) && $_SESSION['my_config_version'] !== $mtime) {
+    $force_reload = true;
+  }
   if (!isset($_SESSION['my_config']) || $force_reload) {
     $source = preg_replace("~^#+.*$~m", "", file_get_contents('/etc/birdnet/birdnet.conf'));
     $my_config = parse_ini_string($source);
@@ -27,6 +31,7 @@ function get_config($force_reload = false) {
     } else {
       syslog(LOG_ERR, "Cannot parse config");
     }
+    $_SESSION['my_config_version'] = $mtime;
   }
   return $_SESSION['my_config'];
 }
