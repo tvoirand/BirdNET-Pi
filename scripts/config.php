@@ -1,7 +1,9 @@
 <?php
 error_reporting(E_ERROR);
 ini_set('display_errors',1);
-require_once "scripts/common.php";
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'/scripts/common.php');
+
 $user = get_user();
 $home = get_home();
 $config = get_config();
