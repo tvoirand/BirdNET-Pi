@@ -67,13 +67,15 @@ df2 = get_data(conn)
 df2['DateTime'] = pd.to_datetime(df2['Date'] + " " + df2['Time'])
 df2 = df2.set_index('DateTime')
 
+if len(df2) == 0:
+    st.info('No data yet. Please come back later.')
+    exit(0)
+
 daily = st.sidebar.checkbox('Single Day View', help='Select if you want single day view, unselect for multi-day views')
 
 if daily:
-    # Date as slider
     Start_Date = pd.to_datetime(df2.index.min()).date()
     End_Date = pd.to_datetime(df2.index.max()).date()
-#     cols1, cols2 = st.columns((1, 1))
     end_date = st.sidebar.date_input('Date to View',
                                      min_value=Start_Date,
                                      max_value=End_Date,
@@ -83,22 +85,11 @@ if daily:
 else:
     Start_Date = pd.to_datetime(df2.index.min()).date()
     End_Date = pd.to_datetime(df2.index.max()).date()
-
-#    cols1, cols2 = st.columns((1, 1))
     start_date, end_date = st.sidebar.slider('Date Range',
                                              min_value=Start_Date-timedelta(days=1),
                                              max_value=End_Date,
                                              value=(Start_Date, End_Date),
                                              help='Select start and end date, if same date get a clockplot for a single day')
-
-# start_date, end_date = cols1.date_input(
-#     "Date Input for Analysis - select Range for single specie analysis, select single date for daily view",
-#     value=(Start_Date, End_Date),
-#     min_value=Start_Date,
-#     max_value=End_Date)
-
-# start_date = datetime(2022 ,5 ,17).date()
-# end_date = datetime(2022 ,5 ,17).date()
 
 
 @st.cache_data()
@@ -168,13 +159,15 @@ hourly = pd.crosstab(df5, df5.index.hour, dropna=True, margins=True)
 # Filter on species
 species = list(hourly.sort_values("All", ascending=False).index)
 
-# cols1, cols2 = st.columns((1, 1))
-top_N = st.sidebar.slider(
-    'Select Number of Birds to Show',
-    min_value=1,
-    max_value=len(Specie_Count),
-    value=min(10, len(Specie_Count))
-)
+if len(Specie_Count) > 1:
+    top_N = st.sidebar.slider(
+        'Select Number of Birds to Show',
+        min_value=1,
+        max_value=len(Specie_Count),
+        value=min(10, len(Specie_Count))
+    )
+else:
+    top_N = 1
 
 top_N_species = (df5.value_counts()[:top_N])
 
