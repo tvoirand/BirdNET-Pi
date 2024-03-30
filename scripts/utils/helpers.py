@@ -29,7 +29,7 @@ def _load_settings(settings_path='/etc/birdnet/birdnet.conf', force_reload=False
     global _settings
     if _settings is None or force_reload:
         with open(settings_path) as f:
-            parser = PHPConfigParser()
+            parser = PHPConfigParser(interpolation=None)
             # preserve case
             parser.optionxform = lambda option: option
             lines = chain(("[top]",), f)
