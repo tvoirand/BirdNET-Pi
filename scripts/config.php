@@ -443,12 +443,22 @@ function runProcess() {
 
       <table class="settingstable"><tr><td>
       <h2>Location</h2>
-      <label for="site_name">Site Name: </label>
-      <input name="site_name" type="text" value="<?php print($config['SITE_NAME']);?>"/> (Optional)<br>
-      <label for="latitude">Latitude: &nbsp; &nbsp;</label>
-      <input name="latitude" type="number" max="90" min="-90" step="0.0001" value="<?php print($config['LATITUDE']);?>" required/><br>
-      <label for="longitude">Longitude: </label>
-      <input name="longitude" type="number" max="180" min="-180" step="0.0001" value="<?php print($config['LONGITUDE']);?>" required/><br>
+      <table class="settingstable plaintable">
+        <tr>
+          <td><label for="site_name">Site Name:</label></td>
+          <td><input name="site_name" type="text" value="<?php print($config['SITE_NAME']);?>"/></td>
+          <td>(Optional)</td>
+        </tr>
+        <tr>
+          <td><label for="latitude">Latitude:</label></td>
+          <td><input name="latitude" type="number" style="width:6em;" max="90" min="-90" step="0.0001" value="<?php print($config['LATITUDE']);?>" required/></td>
+        </tr>
+        <tr>
+          <td><label for="longitude">Longitude: </label></td>
+          <td><input name="longitude" type="number" style="width:6em;" max="180" min="-180" step="0.0001" value="<?php print($config['LONGITUDE']);?>" required/></td>
+          <td></td>
+        </tr>
+      </table>
       <p>Set your Latitude and Longitude to 4 decimal places. Get your coordinates <a href="https://latlong.net" target="_blank">here</a>.</p>
       </td></tr></table><br>
       <table class="settingstable"><tr><td>

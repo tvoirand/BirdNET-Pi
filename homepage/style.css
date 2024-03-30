@@ -801,6 +801,13 @@ form#views button .updatenumber {
 .settingstable h2 {
   font-size:x-large;
 }
+.plaintable {
+  box-shadow: unset;
+}
+.plaintable td {
+  padding: unset;
+}
+
 .brbanner h1 {
   margin:0px;
   font-size: xx-large;
