@@ -285,16 +285,16 @@ $newconfig = get_config();
 
       <h2>Audio Settings</h2>
       <label for="rec_card">Audio Card: </label>
-      <input name="rec_card" type="text" value="<?php print($newconfig['REC_CARD']);?>" required/><br>
+      <input name="rec_card" type="text" size="12" value="<?php print($newconfig['REC_CARD']);?>" required/><br>
       <p>Set Audio Card to 'default' to use PulseAudio (always recommended), or an ALSA recognized sound card device from the output of `arecord -L`. Choose the `dsnoop` device if it is available</p>
       <label for="channels">Audio Channels: </label>
-      <input name="channels" type="number" min="1" max="32" step="1" value="<?php print($newconfig['CHANNELS']);?>" required/><br>
+      <input name="channels" type="number" style="width:3em;" min="1" max="32" step="1" value="<?php print($newconfig['CHANNELS']);?>" required/><br>
       <p>Set Channels to the number of channels supported by your sound card. 32 max.</p>
       <label for="recording_length">Recording Length: </label>
-      <input name="recording_length" oninput="document.getElementsByName('extraction_length')[0].setAttribute('max', this.value);" type="number" min="3" max="60" step="1" value="<?php print($newconfig['RECORDING_LENGTH']);?>" required/><br>
+      <input name="recording_length" oninput="document.getElementsByName('extraction_length')[0].setAttribute('max', this.value);" type="number" style="width:3em;" min="3" max="60" step="1" value="<?php print($newconfig['RECORDING_LENGTH']);?>" required/><br>
       <p>Set Recording Length in seconds between 6 and 60. Multiples of 3 are recommended, as BirdNET analyzes in 3-second chunks.</p> 
       <label for="extraction_length">Extraction Length: </label>
-      <input name="extraction_length" oninput="this.setAttribute('max', document.getElementsByName('recording_length')[0].value);" type="number" min="3" value="<?php print($newconfig['EXTRACTION_LENGTH']);?>" /><br>
+      <input name="extraction_length" oninput="this.setAttribute('max', document.getElementsByName('recording_length')[0].value);" type="number" style="width:3em;" min="3" value="<?php print($newconfig['EXTRACTION_LENGTH']);?>" /><br>
       <p>Set Extraction Length to something less than your Recording Length. Min=3 Max=Recording Length</p>
       <label for="audiofmt">Extractions Audio Format</label>
       <select name="audiofmt">
@@ -436,17 +436,17 @@ foreach($formats as $format){
 
       <p>
         <label for="overlap">Overlap: </label>
-        <input name="overlap" type="number" min="0.0" max="2.9" step="0.1" value="<?php print($newconfig['OVERLAP']);?>" required/><br>
+        <input name="overlap" type="number" style="width:4em;" min="0.0" max="2.9" step="0.1" value="<?php print($newconfig['OVERLAP']);?>" required/><br>
   &nbsp;&nbsp;&nbsp;&nbsp;Min=0.0, Max=2.9
       </p>
       <p>
         <label for="confidence">Minimum Confidence: </label>
-        <input name="confidence" type="number" min="0.01" max="0.99" step="0.01" value="<?php print($newconfig['CONFIDENCE']);?>" required/><br>
+        <input name="confidence" type="number" style="width:4em;" min="0.01" max="0.99" step="0.01" value="<?php print($newconfig['CONFIDENCE']);?>" required/><br>
         &nbsp;&nbsp;&nbsp;&nbsp;Min=0.01, Max=0.99
       </p>
       <p>
         <label for="sensitivity">Sigmoid Sensitivity: </label>
-        <input name="sensitivity" type="number" min="0.5" max="1.5" step="0.01" value="<?php print($newconfig['SENSITIVITY']);?>" required/><br>
+        <input name="sensitivity" type="number" style="width:4em;" min="0.5" max="1.5" step="0.01" value="<?php print($newconfig['SENSITIVITY']);?>" required/><br>
   &nbsp;&nbsp;&nbsp;&nbsp;Min=0.5, Max=1.5
       </p>
       </td></tr></table><br>
@@ -479,20 +479,20 @@ foreach($formats as $format){
         Using ffmpeg:
         e.g. origin=6000, target=4000, performs a shift of 2000 Hz down.<br>
         <label for="freqshift_hi">Origin [Hz]: </label>
-        <input name="freqshift_hi" type="number" min="0" max="20000" step="1" value="<?php print($newconfig['FREQSHIFT_HI']);?>" required/><br>
+        <input name="freqshift_hi" type="number" style="width:5em;" min="0" max="20000" step="1" value="<?php print($newconfig['FREQSHIFT_HI']);?>" required/><br>
         <label for="freqshift_lo">Target [Hz]: </label>
-        <input name="freqshift_lo" type="number" min="0" max="20000" step="1" value="<?php print($newconfig['FREQSHIFT_LO']);?>" required/>
+        <input name="freqshift_lo" type="number" style="width:5em;" min="0" max="20000" step="1" value="<?php print($newconfig['FREQSHIFT_LO']);?>" required/>
         </p>
         <p style="margin-left: 40px">
         <label for="freqshift_reconnect_delay">Livestream reconnection delay (in ms): </label>
-        <input name="freqshift_reconnect_delay" type="number" min="1000" max="10000" step="100" value="<?php print($newconfig['FREQSHIFT_RECONNECT_DELAY']);?>" required/>
+        <input name="freqshift_reconnect_delay" type="number" style="width:5em;" min="1000" max="10000" step="100" value="<?php print($newconfig['FREQSHIFT_RECONNECT_DELAY']);?>" required/>
         </p>
 
         <p style="margin-left: 40px">
         Using sox:
         e.g. shiftPitch=-1200 performs a shift of 1 octave down. This value is in 100ths of a semitone.<br>
         <label for="freqshift_pitch">Pitch shift: </label>
-        <input name="freqshift_pitch" type="number" min="-4000" max="4000" step="1" value="<?php print($newconfig['FREQSHIFT_PITCH']);?>" required/><br>
+        <input name="freqshift_pitch" type="number" style="width:6em;" min="-4000" max="4000" step="1" value="<?php print($newconfig['FREQSHIFT_PITCH']);?>" required/><br>
         </p>
 		</td></tr></table><br>
 
