@@ -5,7 +5,7 @@ echo 'zram' | sudo tee /etc/modules-load.d/zram.conf
 sudo touch /etc/modprobe.d/zram.conf
 echo 'options zram num_devices=1' | sudo tee /etc/modprobe.d/zram.conf
 sudo touch /etc/udev/rules.d/99-zram.rules
-echo 'KERNEL=="zram0", ATTR{disksize}="2G",TAG+="systemd"' \
+echo 'KERNEL=="zram0", ATTR{comp_algorithm}="zstd", ATTR{disksize}="500M", TAG+="systemd"' \
   | sudo tee /etc/udev/rules.d/99-zram.rules
 sudo touch /etc/systemd/system/zram.service
 echo "Installing zram.service"
@@ -17,7 +17,7 @@ After=multi-user.target
 Type=oneshot 
 RemainAfterExit=true
 ExecStartPre=/sbin/mkswap /dev/zram0
-ExecStart=/sbin/swapon /dev/zram0
+ExecStart=/sbin/swapon -p 15 /dev/zram0
 ExecStop=/sbin/swapoff /dev/zram0
 [Install]
 WantedBy=multi-user.target
