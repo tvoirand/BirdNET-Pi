@@ -459,7 +459,7 @@ function runProcess() {
       </td></tr></table><br>
       <table class="settingstable" style="width:100%"><tr><td>
       <h2>Notifications</h2>
-      <p><a target="_blank" href="https://github.com/caronc/apprise/wiki">Apprise Notifications</a> can be setup and enabled for 70+ notification services. Each service should be on its own line.</p>
+      <p><a target="_blank" href="https://github.com/caronc/apprise/wiki">Apprise Notifications</a> can be setup and enabled for 90+ notification services. Each service should be on its own line.</p>
       <label for="apprise_input">Apprise Notifications Configuration: </label><br>
       <textarea placeholder="mailto://{user}:{password}@gmail.com
 tgram://{bot_token}/{chat_id}
@@ -496,7 +496,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <dt>$flickrimage</dt>
       <dd>A preview image of the detected species from Flickr. Set your API key below.</dd>
       <dt>$reason</dt>
-      <dd>The reason a message was sent</dd>
+      <dd>The reason a notification was sent</dd>
       </dl>
       <p>Use the variables defined above to customize your notification title and body.</p>
       <label for="apprise_notification_title">Notification Title: </label>
