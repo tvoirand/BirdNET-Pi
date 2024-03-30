@@ -78,6 +78,7 @@ if(isset($_GET['blocation']) ) {
 </style>
 </head>
 <body>
+<script src="static/dialog-polyfill.js"></script>
 <div class="history centered">
 
 <dialog id="attribution-dialog">
