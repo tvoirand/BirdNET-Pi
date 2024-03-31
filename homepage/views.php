@@ -47,11 +47,13 @@ elseif ($config["LONGITUDE"] == "0.000") {
 }
 ?>
 <!DOCTYPE html>
-<link rel="stylesheet" href="style.css?v=<?php echo date ('n.d.y', filemtime('style.css')); ?>">
-<style>
-
-</style>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BirdNET-Pi DB</title>
+  <link rel="stylesheet" href="style.css?v=<?php echo date ('n.d.y', filemtime('style.css')); ?>">
+</head>
 <body>
 <div class="topnav" id="myTopnav">
 <form action="views.php" method="GET" id="views">
