@@ -190,15 +190,6 @@ button:hover {
   display: none;
 }
 
-.play table {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.stats table {
-  width: 60%;
-}
-
 .overview th {
   background-color: rgb(219, 255, 235);
   text-align: center;
