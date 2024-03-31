@@ -328,7 +328,7 @@ if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true"  ) {
           </td>
           <td><b>Confidence:</b> <?php echo round((float)round($todaytable['Confidence'],2) * 100 ) . '%';?><br></td>
           <?php if(!isset($_GET['mobile'])) { ?>
-              <td style="min-width:180px"><audio controls preload="none" title="<?php echo $filename;?>"><source preload="none" src="<?php echo $filename;?>"></audio></td>
+              <td style="min-width:180px"><audio controls preload="none" src="<?php echo $filename;?>"></audio></td>
           <?php } ?>
         <?php } ?>
   <?php }?>
@@ -378,18 +378,16 @@ if(isset($_GET['today_stats'])) {
 die(); 
 }
 
-?>
-
-<!DOCTYPE html>
+if (get_included_files()[0] === __FILE__) {
+  echo '<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BirdNET-Pi DB</title>
-  <style>
-</style>
-</head>
+</head>';
+}
+?>
 <div class="viewdb">
   <dialog style="margin-top: 5px;max-height: 95vh;
   overflow-y: auto;overscroll-behavior:contain" id="attribution-dialog">
@@ -461,7 +459,7 @@ die();
   }
   </script>  
     <h3>Number of Detections</h3>
-    <div id="todaystats" class="overview"><table>
+    <div id="todaystats" class="overview"><form action="views.php" method="GET"><table>
       <tr>
   <th>Total</th>
   <th>Today</th>
@@ -471,18 +469,12 @@ die();
       </tr>
       <tr>
       <td><?php echo $totalcount['COUNT(*)'];?></td>
-      <form action="" method="GET">
       <td><input type="hidden" name="view" value="Recordings"><?php if($kiosk == false){?><button type="submit" name="date" value="<?php echo date('Y-m-d');?>"><?php echo $todaycount['COUNT(*)'];?></button><?php } else { echo $todaycount['COUNT(*)']; }?></td>
-      </form>
       <td><?php echo $hourcount['COUNT(*)'];?></td>
-      <form action="" method="GET">
       <td><?php if($kiosk == false){?><button type="submit" name="view" value="Species Stats"><?php echo $totalspeciestally['COUNT(DISTINCT(Com_Name))'];?></button><?php }else { echo $totalspeciestally['COUNT(DISTINCT(Com_Name))']; }?></td>
-      </form>
-      <form action="" method="GET">
       <td><input type="hidden" name="view" value="Recordings"><?php if($kiosk == false){?><button type="submit" name="date" value="<?php echo date('Y-m-d');?>"><?php echo $todayspeciestally['COUNT(DISTINCT(Com_Name))'];?></button><?php } else { echo $todayspeciestally['COUNT(DISTINCT(Com_Name))']; }?></td>
-      </form>
       </tr>
-    </table></div>
+    </table></form></div>
 
 
     <h3>Today's Detections <?php if($kiosk == false) { ?>— <input autocomplete="off" size="11" type="text" placeholder="Search..." id="searchterm" name="searchterm"><?php } ?></h3>
