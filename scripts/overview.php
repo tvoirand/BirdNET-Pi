@@ -258,15 +258,17 @@ $totalspeciestally = $result6->fetchArray(SQLITE3_ASSOC);
 <?php
 die();
 }
-?>
+
+if (get_included_files()[0] === __FILE__) {
+  echo '<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Overview</title>
-<style>
-
-</style>
-</head>
+</head>';
+}
+?>
 <div class="overview">
   <dialog style="margin-top: 5px;max-height: 95vh;
   overflow-y: auto;overscroll-behavior:contain" id="attribution-dialog">
