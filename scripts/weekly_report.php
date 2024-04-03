@@ -9,6 +9,19 @@ $enddate = strtotime('last sunday') - (1*86400);
 
 $debug = false;
 
+function safe_percentage($count, $prior_count) {
+	if ($prior_count !== 0) {
+		$percentagediff = round((($count - $prior_count) / $prior_count) * 100);
+	} else {
+		if ($count > 0) {
+			$percentagediff = INF;
+		} else {
+			$percentagediff = 0;
+		}
+	}
+	return $percentagediff;
+}
+
 if(isset($_GET['ascii'])) {
 
 	$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
@@ -38,15 +51,14 @@ if(isset($_GET['ascii'])) {
 	$result7= $statement7->execute();
 	$priortotalspeciestally = $result7->fetchArray(SQLITE3_ASSOC)['COUNT(DISTINCT(Com_Name))'];
 
-	$percentagedifftotal = round( (($totalcount - $priortotalcount) / $priortotalcount) * 100  );
-
+	$percentagedifftotal = safe_percentage($totalcount, $priortotalcount);
 	if($percentagedifftotal > 0) {
 		$percentagedifftotal = "<span style='color:green;font-size:small'>+".$percentagedifftotal."%</span>";
 	} else {
 		$percentagedifftotal = "<span style='color:red;font-size:small'>-".abs($percentagedifftotal)."%</span>";
 	}
 
-	$percentagedifftotaldistinctspecies = round( (($totalspeciestally - $priortotalspeciestally) / $priortotalspeciestally) * 100  );
+	$percentagedifftotaldistinctspecies = safe_percentage($totalspeciestally, $priortotalspeciestally);
 	if($percentagedifftotaldistinctspecies > 0) {
 		$percentagedifftotaldistinctspecies = "<span style='color:green;font-size:small'>+".$percentagedifftotaldistinctspecies."%</span>";
 	} else {
@@ -80,9 +92,7 @@ if(isset($_GET['ascii'])) {
 			$priorweekcount = $totalcount['COUNT(*)'];
 
       // really percent changed
-			if($priorweekcount > 0){
-                                $percentagediff = round( (($scount - $priorweekcount) / $priorweekcount) * 100  );
-
+			$percentagediff = safe_percentage($scount, $priorweekcount);
                                 if($percentagediff > 0) {
                                         $percentagediff = "<span style='color:green;font-size:small'>+".$percentagediff."%</span>";
                                 } else {
@@ -90,9 +100,6 @@ if(isset($_GET['ascii'])) {
                                 }
 
                                 echo $com_name." - ".$scount." (".$percentagediff.")<br>";
-                        } else {
-                                echo $com_name." - ".$scount ."<br>";
-                        }
 		}
 	}
 
@@ -177,12 +184,7 @@ while($detection=$result1->fetchArray(SQLITE3_ASSOC))
 			$totalcount = $result2->fetchArray(SQLITE3_ASSOC);
 			$priorweekcount = $totalcount['COUNT(*)'];
 
-			if ($priorweekcount > 0) {
-				$percentagediff = round( (($scount - $priorweekcount) / $priorweekcount) * 100  );
-			} else {
-				$percentagediff = 0;
-			}
-
+			$percentagediff = safe_percentage($scount, $priorweekcount);
 			if($percentagediff > 0) {
 				$percentagediff = "<span style='color:green;font-size:small'>+".$percentagediff."%</span>";
 			} else {
