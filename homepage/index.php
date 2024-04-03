@@ -10,11 +10,9 @@ set_timezone();
 
 ?>
 <!DOCTYPE html>
+<html lang="en">
 <title><?php echo $site_name; ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-
-</style>
 <link rel="stylesheet" href="style.css?v=<?php echo date ('n.d.y', filemtime('style.css')); ?>">
 <link rel="stylesheet" type="text/css" href="static/dialog-polyfill.css" />
 <body>
@@ -39,7 +37,7 @@ if(isset($_GET['stream'])){
   </div><div class=\"centered\"><h3>$site_name</h3></div>";
 } else {
     echo "
-  <form action=\"\" method=\"GET\">
+  <form action=\"index.php\" method=\"GET\">
     <button type=\"submit\" name=\"stream\" value=\"play\">Live Audio</button>
   </form>
   </div>
@@ -49,11 +47,8 @@ if(isset($_GET['stream'])){
 if(isset($_GET['filename'])) {
   $filename = $_GET['filename'];
 echo "
-<iframe src=\"/views.php?view=Recordings&filename=$filename\"></iframe>
-</div>";
+<iframe src=\"/views.php?view=Recordings&filename=$filename\"></iframe>";
 } else {
   echo "
-<iframe src=\"/views.php\"></iframe>
-</div>";
+<iframe src=\"/views.php\"></iframe>";
 }
-?>
