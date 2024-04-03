@@ -63,9 +63,9 @@ if(isset($_GET['blocation']) ) {
 
 	die();
 }
-
-?>
-
+if (get_included_files()[0] === __FILE__) {
+	echo '<!DOCTYPE html>
+<html lang="en">
 <head>
 
 <style>
@@ -77,7 +77,9 @@ if(isset($_GET['blocation']) ) {
 }
 </style>
 </head>
-<body>
+<body>';
+	}
+?>
 <script src="static/dialog-polyfill.js"></script>
 <div class="history centered">
 
@@ -154,6 +156,9 @@ if (file_exists('./Charts/'.$chart2)) {
   echo "<img src=\"/Charts/$chart2?nocache=$time\">";
 } else {
   echo "<p>No Charts For $theDate</p>";
-}?>
-</div>
-</html>
+}
+echo "</div>";
+if (get_included_files()[0] === __FILE__) {
+	echo '</html>
+</body>';
+}
