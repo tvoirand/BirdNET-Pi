@@ -7,6 +7,7 @@ from time import sleep
 
 import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import rcParams
@@ -88,6 +89,8 @@ def create_plot(df_plt_today, now, is_top):
     hours_in_day = pd.Series(data=range(0, 24))
     heat_frame = pd.DataFrame(data=0, index=heat.index, columns=hours_in_day)
     heat = (heat+heat_frame).fillna(0)
+    # mask out zeros, so they do not show up in the final plot. this happens when max count/h is one
+    heat[heat == 0] = np.nan
 
     # Generatie heatmap plot
     plot = sns.heatmap(heat, norm=LogNorm(),  annot=True,  annot_kws={"fontsize": 7}, fmt="g", cmap=pal, square=False,
