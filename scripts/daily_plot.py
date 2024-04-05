@@ -33,12 +33,16 @@ def get_data(now=None):
     return df, now
 
 
-def create_plot(df_plt_today, now, is_top):
-    readings = 10
-    if is_top:
-        plt_selection_today = (df_plt_today['Com_Name'].value_counts()[:readings])
+def create_plot(df_plt_today, now, is_top=None):
+    if is_top is not None:
+        readings = 10
+        if is_top:
+            plt_selection_today = (df_plt_today['Com_Name'].value_counts()[:readings])
+        else:
+            plt_selection_today = (df_plt_today['Com_Name'].value_counts()[-readings:])
     else:
-        plt_selection_today = (df_plt_today['Com_Name'].value_counts()[-readings:])
+        plt_selection_today = df_plt_today['Com_Name'].value_counts()
+        readings = len(df_plt_today['Com_Name'].value_counts())
 
     df_plt_selection_today = df_plt_today[df_plt_today.Com_Name.isin(plt_selection_today.index)]
 
@@ -56,11 +60,14 @@ def create_plot(df_plt_today, now, is_top):
 
     # norm values for color palette
     norm = plt.Normalize(confmax.values.min(), confmax.values.max())
-    if is_top:
+    if is_top or is_top is None:
         # Set Palette for graphics
         pal = "Greens"
         colors = plt.cm.Greens(norm(confmax)).tolist()
-        plot_type = "Top"
+        if is_top:
+            plot_type = "Top"
+        else:
+            plot_type = 'All'
         name = "Combo"
     else:
         # Set Palette for graphics
@@ -141,8 +148,7 @@ def main(daemon, sleep_m):
         else:
             data, time = get_data(now)
         if not data.empty:
-            create_plot(data, time, is_top=True)
-            create_plot(data, time, is_top=False)
+            create_plot(data, time)
         else:
             print('empty dataset')
         if daemon:
