@@ -128,17 +128,18 @@ function submitID() {
 
 </script>  
 
-<form action="" method="GET">
+<form action="views.php" method="GET">
   <input type="date" name="date" value="<?php echo $theDate;?>">
   <button type="submit" name="view" value="Daily Charts">Submit Date</button>
 </form>
-		<table>
-			<tr>
-				<th>Total Detections For The Day</th>
-				<td><?php echo $totalcount['COUNT(*)'];?></td>
-                <td><img id="SwipeSpinner" style="height:30px;"></td>
-			</tr>
-		</table>
+<br>
+<table class="overview">
+  <tr>
+    <th>Total Detections For The Day</th>
+    <td><?php echo $totalcount['COUNT(*)']; ?></td>
+    <td><img id="SwipeSpinner" style="height:30px;"></td>
+  </tr>
+</table>
     	<?php // <br><button type="button" onclick="showDialog()">Export as CSV for eBird</button><br><br> ?>
 <?php
 $time = time();
