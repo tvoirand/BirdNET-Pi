@@ -148,16 +148,17 @@ if(isset($_GET['bydate'])){
   unset($_SESSION['date']);
   $view = "choose";
 }
-?>
 
-<html>
+if (get_included_files()[0] === __FILE__) {
+  echo '<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-    </style>
-  </head>
+  </head>';
+}
 
+?>
 <script>
 function deleteDetection(filename,copylink=false) {
   if (confirm("Are you sure you want to delete this detection from the database?") == true) {
@@ -259,7 +260,7 @@ if(!isset($_GET['species']) && !isset($_GET['filename'])){
 <?php if($view == "byspecies" || $view == "date") { ?>
 <div style="width: auto;
    text-align: center">
-   <form action="" method="GET">
+   <form action="views.php" method="GET">
       <input type="hidden" name="view" value="Recordings">
       <input type="hidden" name="<?php echo $view; ?>" value="<?php echo $_GET['date']; ?>">
       <button <?php if(!isset($_GET['sort']) || $_GET['sort'] == "alphabetical"){ echo "style='background:#9fe29b !important;'"; }?> class="sortbutton" type="submit" name="sort" value="alphabetical">
@@ -270,12 +271,11 @@ if(!isset($_GET['species']) && !isset($_GET['filename'])){
       </button>
    </form>
 </div>
+<br>
 <?php } ?>
-
+<form action="views.php" method="GET">
+<input type="hidden" name="view" value="Recordings">
 <table>
-  <tr>
-    <form action="" method="GET">
-    <input type="hidden" name="view" value="Recordings">
 <?php
   #By Date
   if($view == "bydate") {
@@ -364,16 +364,14 @@ for ($row = 0; $row < $num_rows; $row++) {
       <tr><td><button action=\"submit\" name=\"bydate\" value=\"bydate\">By Date</button></td>";
   } 
 
-  echo "</form>
-    </tr>
-    </table>";
+  echo "</table></form>";
 }
 
 #Specific Species
 if(isset($_GET['species'])){ ?>
 <div style="width: auto;
    text-align: center">
-   <form action="" method="GET">
+   <form action="views.php" method="GET">
       <input type="hidden" name="view" value="Recordings">
       <input type="hidden" name="species" value="<?php echo $_GET['species']; ?>">
       <input type="hidden" name="sort" value="<?php echo $_GET['sort']; ?>">
@@ -563,15 +561,8 @@ echo "<table>
             </tr>";
         }
 
-      }echo "</table>";}?>
-</div>
-<style>
-td.spec {
-  width: calc(100% / <?php echo $num_cols;?>);
+      }echo "</table>";}
+      echo "</div>";
+if (get_included_files()[0] === __FILE__) {
+  echo '</html>';
 }
-tr:first-child td.spec {
-  padding-top: 10px;
-}
-</style>
-
-</html>
