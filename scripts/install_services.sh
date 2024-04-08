@@ -233,6 +233,9 @@ WantedBy=multi-user.target
 EOF
   ln -sf $HOME/BirdNET-Pi/templates/avahi-alias@.service /usr/lib/systemd/system
   systemctl enable avahi-alias@"$(hostname)".local.service
+  # symbolic link does not work here, so just copy
+  cp -f $HOME/BirdNET-Pi/templates/http.service /etc/avahi/services/
+  systemctl restart avahi-daemon.service
 }
 
 install_birdnet_stats_service() {

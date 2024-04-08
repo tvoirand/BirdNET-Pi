@@ -27,6 +27,11 @@ remove_services() {
   set +x
   remove_icecast
   remove_crons
+  remove_avahi_services
+}
+
+remove_avahi_services() {
+  sudo rm -v "/etc/avahi/services/http.service"
 }
 
 remove_crons() {

@@ -154,6 +154,12 @@ if grep -q 'php7.4-' /etc/caddy/Caddyfile &>/dev/null; then
   sed -i 's/php7.4-/php-/' /etc/caddy/Caddyfile
 fi
 
+if ! [ -L /etc/avahi/services/http.service ];then
+  # symbolic link does not work here, so just copy
+  cp -f $HOME/BirdNET-Pi/templates/http.service /etc/avahi/services/
+  systemctl restart avahi-daemon.service
+fi
+
 if [ -L /usr/local/bin/analyze.py ];then
   rm -f /usr/local/bin/analyze.py
 fi
