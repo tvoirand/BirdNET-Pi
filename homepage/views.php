@@ -379,7 +379,7 @@ window.onbeforeunload = function(event) {
 }
 
 function getTheDate(increment) {
-  var theDate = "<?php echo $theDate;?>";
+  var theDate = "<?php if (isset($theDate)) echo $theDate;?>";
 
   d = new Date(theDate);
   d.setDate(d.getDate(theDate) + increment);
