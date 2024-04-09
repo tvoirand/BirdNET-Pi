@@ -2,7 +2,6 @@
 <style>
 </style>
 
-<body>
 <div class="customlabels column1">
 <form action="" method="GET" id="add">
   <h3>All Species Labels</h3>
@@ -138,5 +137,3 @@
         }
     }
 </script>
-
-</body>
