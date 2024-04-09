@@ -126,8 +126,8 @@ if(isset($_GET['ascii'])) {
         $prevweek = date('W', $enddate) - 1;
         if($prevweek < 1) { $prevweek = 52; } 
 
-	echo "<hr><small>* data from ".date('Y-m-d', $startdate)." — ".date('Y-m-d',$enddate).".</small><br>";
-	echo '<small>* percentages are calculated relative to week '.($prevweek).'.</small>';
+	echo "<hr><span style='font-size:small'>* data from ".date('Y-m-d', $startdate)." — ".date('Y-m-d',$enddate).".</span><br>";
+	echo "<span style='font-size:small'>* percentages are calculated relative to week ".($prevweek).".</span>";
 
 	die();
 }
