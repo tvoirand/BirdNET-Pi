@@ -38,8 +38,9 @@ def show_values_on_bars(ax, label):
     for i, p in enumerate(ax.patches):
         x = p.get_x() + p.get_width() * 0.9
         y = p.get_y() + p.get_height() / 2
-        value = '{:.0%}'.format(label[i])
-        # Uncomment for Species Count Total
+        # Species confidence
+        # value = '{:.0%}'.format(label.iloc[i])
+        # Species Count Total
         value = '{:n}'.format(p.get_width())
         bbox = {'facecolor': 'lightgrey', 'edgecolor': 'none', 'pad': 1.0}
         ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
