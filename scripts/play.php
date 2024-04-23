@@ -325,7 +325,8 @@ if(!isset($_GET['species']) && !isset($_GET['filename'])){
 while($results=$result->fetchArray(SQLITE3_ASSOC))
 {
   $name = $results['Com_Name'];
-  if(realpath($home."/BirdSongs/Extracted/By_Date/".$date."/".str_replace(" ", "_",$name)) !== false){
+  $dir_name = str_replace("'", '', $name);
+  if(realpath($home."/BirdSongs/Extracted/By_Date/".$date."/".str_replace(" ", "_", $dir_name)) !== false){
     $birds[] = $name;
   }
 }
