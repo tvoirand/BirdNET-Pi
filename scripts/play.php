@@ -133,7 +133,7 @@ if(isset($_GET['bydate'])){
 
   #Specific Species
 } elseif(isset($_GET['species'])) {
-  $species = $_GET['species'];
+  $species = htmlspecialchars_decode($_GET['species'], ENT_QUOTES);
   session_start();
   $_SESSION['species'] = $species;
   $statement = $db->prepare("SELECT * FROM detections WHERE Com_Name == \"$species\" ORDER BY Com_Name");
@@ -394,7 +394,7 @@ if ($fp) {
   $disk_check_exclude_arr = [];
 }
 
-$name = $_GET['species'];
+$name = htmlspecialchars_decode($_GET['species'], ENT_QUOTES);
 if(isset($_SESSION['date'])) {
   $date = $_SESSION['date'];
   if(isset($_GET['sort']) && $_GET['sort'] == "confidence") {
