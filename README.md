@@ -163,6 +163,11 @@ PLEASE search the repo for your issue before creating a new one. This repo has n
 Please join a Discussion!! and please join [BirdWeather!!](https://app.birdweather.com)
 I hope that if you find BirdNET-Pi has been worth your time, you will share your setup, results, customizations, etc. [HERE](https://github.com/mcguirepr89/BirdNET-Pi/discussions/69) and will consider [making your installation public](https://github.com/mcguirepr89/BirdNET-Pi/wiki/Sharing-Your-BirdNET-Pi).
 
+## Homeassistant addon
+
+BirdNET-Pi can also be run as a [Homeassistant](https://www.home-assistant.io/) addon through docker.
+For more information : https://github.com/alexbelgium/hassio-addons/blob/master/birdnet-pi/README.md
+
 ## Cool Links
 
 - [Marie Lelouche's <i>Out of Spaces</i>](https://www.lestanneries.fr/exposition/marie-lelouche-out-of-spaces/) using BirdNET-Pi in post-sculpture VR! [Press Kit](https://github.com/mcguirepr89/BirdNET-Pi-assets/blob/main/dp_out_of_spaces_marie_lelouche_digital_05_01_22.pdf)
