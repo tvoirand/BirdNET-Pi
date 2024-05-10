@@ -260,3 +260,25 @@ class Flickr {
   }
 
 }
+
+function get_info_url($sciname){
+  $engname = get_com_en_name($sciname);
+  $config = get_config();
+  if ($config['INFO_SITE'] === 'EBIRD'){
+    require 'scripts/ebird.php';
+    $ebird = $ebirds[$sciname];
+    debug_log($ebird);
+    $language = $config['DATABASE_LANG'];
+    $url = "https://ebird.org/species/$ebird?siteLanguage=$language";
+    $url_title = "eBirds";
+  } else {
+    $engname_url = str_replace("'", '', str_replace(' ', '_', $engname));
+    $url = "https://allaboutbirds.org/guide/$engname_url";
+    $url_title = "All About Birds";
+  }
+  $ret = array(
+      'URL' => $url,
+      'TITLE' => $url_title
+          );
+  return $ret;
+}

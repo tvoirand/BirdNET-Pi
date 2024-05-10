@@ -198,6 +198,10 @@ if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true"  ) {
     $engname = get_com_en_name($todaytable['Sci_Name']);
     $engname_url = str_replace("'", '', str_replace(' ', '_', $engname));
 
+    $info_url = get_info_url($todaytable['Sci_Name']);
+    $url = $info_url['URL'];
+    $url_title = $info_url['TITLE'];
+
     if (!empty($config["FLICKR_API_KEY"]) && (isset($_GET['display_limit']) || isset($_GET['hard_limit']) || $_GET['kiosk'] == true) ) {
       if ($flickr === null) {
         $flickr = new Flickr();
@@ -232,7 +236,7 @@ if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true"  ) {
             <?php } ?>
 
             <?php echo $todaytable['Time'];?><br> 
-          <b><a class="a2" href="https://allaboutbirds.org/guide/<?php echo $engname_url;?>" target="top"><?php echo $todaytable['Com_Name'];?></a></b><img style="height: 1em;cursor:pointer" title="View species stats" onclick="generateMiniGraph(this, '<?php echo $comname; ?>')" width=25 src="images/chart.svg"><br>
+          <b><a class="a2" href="<?php echo $url;?>" target="top"><?php echo $todaytable['Com_Name'];?></a></b><img style="height: 1em;cursor:pointer" title="<?php echo $url_title;?>" onclick="generateMiniGraph(this, '<?php echo $comname; ?>')" width=25 src="images/chart.svg"><br>
           <a class="a2" href="https://wikipedia.org/wiki/<?php echo $sciname;?>" target="top"><i><?php echo $todaytable['Sci_Name'];?></i></a><br>
           <b>Confidence:</b> <?php echo round((float)round($todaytable['Confidence'],2) * 100 ) . '%';?><br></div><br>
           <video onplay='setLiveStreamVolume(0)' onended='setLiveStreamVolume(1)' onpause='setLiveStreamVolume(1)' controls poster="<?php echo $filename.".png";?>" preload="none" title="<?php echo $filename;?>"><source preload="none" src="<?php echo $filename;?>"></video>
@@ -248,7 +252,7 @@ if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true"  ) {
             <?php } ?>
           </div>
             <div>
-            <b><a class="a2" <?php if($_GET['kiosk'] == false){?>href="https://allaboutbirds.org/guide/<?php echo $engname_url;?>"<?php } else {echo "style='color:blue;'";} ?> target="top"><?php echo $todaytable['Com_Name'];?></a></b>
+            <b><a class="a2" <?php if($_GET['kiosk'] == false){?>href="<?php echo $url;?>"<?php } else {echo "style='color:blue;'";} ?> target="top"><?php echo $todaytable['Com_Name'];?></a></b>
                 <?php
                     //If on mobile, add in a icon to link off to the recording so the user can see more info
                     if (isset($_GET['mobile'])) {

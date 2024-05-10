@@ -164,15 +164,18 @@ while($results=$result3->fetchArray(SQLITE3_ASSOC)){
   $comname = preg_replace('/\'/', '', $comname);
   $linkname = preg_replace('/_/', '+', $dbsciname);
   $filename = "/By_Date/".$date."/".$comname."/".$results['File_Name'];
-  $engname = get_com_en_name($results['Sci_Name']);
-  $engname_url = str_replace("'", '', str_replace(' ', '_', $engname));
+  $engname = get_com_en_name($sciname);
+
+  $info_url = get_info_url($results['Sci_Name']);
+  $url = $info_url['URL'];
+  $url_title = $info_url['TITLE'];
   echo str_pad("<h3>$species</h3>
     <table><tr>
   <td class=\"relative\"><a target=\"_blank\" href=\"index.php?filename=".$results['File_Name']."\"><img title=\"Open in new tab\" class=\"copyimage\" width=25 src=\"images/copy.png\"></a> <a href=\"https://wikipedia.org/wiki/$dbsciname\" target=\"top\"/><i>$sciname</i></a><br>
   <b>Occurrences: </b>$count<br>
   <b>Max Confidence: </b>$maxconf<br>
   <b>Best Recording: </b>$date $time<br>
-  <a href=\"https://allaboutbirds.org/guide/$engname_url\" target=\"top\"/>All About Birds</a><br>
+  <a href=\"$url\" target=\"top\"/>$url_title</a><br>
   <video onplay='setLiveStreamVolume(0)' onended='setLiveStreamVolume(1)' onpause='setLiveStreamVolume(1)' controls poster=\"$filename.png\" title=\"$filename\"><source src=\"$filename\"></video></td>
   </tr>
     </table>
