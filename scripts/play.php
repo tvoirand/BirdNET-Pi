@@ -521,9 +521,11 @@ echo "<table>
         $filename_formatted = $date."/".$comname."/".$results['File_Name'];
 
         // add disk_check_exclude.txt lines into an array for grepping
-        $fp = @fopen($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", 'r'); 
+        $fp = @fopen($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", 'r');
         if ($fp) {
           $disk_check_exclude_arr = explode("\n", fread($fp, filesize($home."/BirdNET-Pi/scripts/disk_check_exclude.txt")));
+        } else {
+          $disk_check_exclude_arr = [];
         }
 
         if($config["FULL_DISK"] == "purge") {
