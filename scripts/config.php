@@ -593,6 +593,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       ?>
 
       </select>
+      <p>! Only modify this at initial setup !</p>
       </td></tr></table>
       <br>
       <script>
