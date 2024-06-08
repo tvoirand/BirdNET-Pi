@@ -63,6 +63,7 @@ if(isset($_GET["latitude"])){
   $flickr_filter_email = $_GET["flickr_filter_email"];
   $language = $_GET["language"];
   $info_site = $_GET["info_site"];
+  $color_scheme = $_GET["color_scheme"];
   $timezone = $_GET["timezone"];
   $model = $_GET["model"];
   $sf_thresh = $_GET["sf_thresh"];
@@ -156,6 +157,7 @@ if(isset($_GET["latitude"])){
   $contents = preg_replace("/FLICKR_API_KEY=.*/", "FLICKR_API_KEY=$flickr_api_key", $contents);
   $contents = preg_replace("/DATABASE_LANG=.*/", "DATABASE_LANG=$language", $contents);
   $contents = preg_replace("/INFO_SITE=.*/", "INFO_SITE=$info_site", $contents);
+  $contents = preg_replace("/COLOR_SCHEME=.*/", "COLOR_SCHEME=$color_scheme", $contents);  
   $contents = preg_replace("/FLICKR_FILTER_EMAIL=.*/", "FLICKR_FILTER_EMAIL=$flickr_filter_email", $contents);
   $contents = preg_replace("/APPRISE_MINIMUM_SECONDS_BETWEEN_NOTIFICATIONS_PER_SPECIES=.*/", "APPRISE_MINIMUM_SECONDS_BETWEEN_NOTIFICATIONS_PER_SPECIES=$minimum_time_limit", $contents);
   $contents = preg_replace("/MODEL=.*/", "MODEL=$model", $contents);
@@ -164,7 +166,7 @@ if(isset($_GET["latitude"])){
   $contents = preg_replace("/APPRISE_ONLY_NOTIFY_SPECIES_NAMES=.*/", "APPRISE_ONLY_NOTIFY_SPECIES_NAMES=\"$only_notify_species_names\"", $contents);
   $contents = preg_replace("/APPRISE_ONLY_NOTIFY_SPECIES_NAMES_2=.*/", "APPRISE_ONLY_NOTIFY_SPECIES_NAMES_2=\"$only_notify_species_names_2\"", $contents);
 
-  if($site_name != $config["SITE_NAME"]) {
+  if($site_name != $config["SITE_NAME"] || $color_scheme != $config["COLOR_SCHEME"]) {
     echo "<script>setTimeout(
     function() {
       window.parent.document.location.reload();
@@ -633,6 +635,24 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <br>ebirds.org has more European species</p>
       </td></tr></table><br>
 
+
+      <table class="settingstable"><tr><td>
+      <h2>Color scheme </h2>
+      <label for="color_scheme">Color scheme for the site : </label>
+      <select name="color_scheme">
+      <?php
+      $scheme = array("light", "dark");
+      foreach($scheme as $color_scheme){
+          $isSelected = "";
+          if($config['COLOR_SCHEME'] == $color_scheme){
+            $isSelected = 'selected="selected"';
+          }
+
+          echo "<option value='{$color_scheme}' $isSelected>$color_scheme</option>";
+        }
+      ?>
+      </td></tr></table><br>
+        
       <script>
         function handleChange(checkbox) {
           // this disables the input of manual date and time if the user wants to use the internet time
