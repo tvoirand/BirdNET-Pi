@@ -220,6 +220,8 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
     $filename = "http://".$_SERVER['SERVER_NAME']."/"."?filename=".$filename;
   }
 
+  $friendlyfilename = "[Listen here](".$filename.")";
+
   $attach="";
   $exampleimage = "https://live.staticflickr.com/7430/27545810581_8bfa8289a3_c.jpg";
   if (strpos($body, '$flickrimage') !== false) {
@@ -234,6 +236,7 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   $title = str_replace("\$confidencepct", round($confidence*100), $title);
   $title = str_replace("\$confidence", $confidence, $title);
   $title = str_replace("\$listenurl", $filename, $title);
+  $title = str_replace("\$friendlyurl", $friendlyfilename, $title);
   $title = str_replace("\$date", $date, $title);
   $title = str_replace("\$time", $time, $title);
   $title = str_replace("\$week", $week, $title);
@@ -250,6 +253,7 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   $body = str_replace("\$confidencepct", round($confidence*100), $body);
   $body = str_replace("\$confidence", $confidence, $body);
   $body = str_replace("\$listenurl", $filename, $body);
+  $body = str_replace("\$friendlyurl", $friendlyfilename, $body);
   $body = str_replace("\$date", $date, $body);
   $body = str_replace("\$time", $time, $body);
   $body = str_replace("\$week", $week, $body);
@@ -499,6 +503,8 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <dd>Confidence Score as a percentage (eg. 0.91 => 91)</dd>
       <dt>$listenurl</dt>
       <dd>A link to the detection</dd>
+      <dt>$friendlyurl</dt>
+      <dd>A masked link to the detection. Only useful for services that support Markdown (e.g. Discord). </dd>
       <dt>$date</dt>
       <dd>Date</dd>
       <dt>$time</dt>
