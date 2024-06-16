@@ -97,7 +97,12 @@ if(isset($_GET["latitude"])){
   }
 
   if(isset($timezone) && in_array($timezone, DateTimeZone::listIdentifiers())) {
+    # dpkg-reconfigure tzdata is a pain to run non-interactively, so we do it in two steps instead
+    # tzlocal.get_localzone() will fail if the Debian specific /etc/timezone is not in sync
     shell_exec("sudo timedatectl set-timezone ".$timezone);
+    if (file_exists('/etc/timezone')) {
+        shell_exec("echo ".$timezone." | sudo tee /etc/timezone > /dev/null");
+    }
     $_SESSION['my_timezone'] = $timezone;
     date_default_timezone_set($timezone);
     echo "<script>setTimeout(
