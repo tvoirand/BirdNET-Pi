@@ -511,7 +511,7 @@ foreach($formats as $format){
             </tr>
             <tr>
                 <td>Birdnet Recording:
-                    <select id="LogLevel_BirdnetRecordingService" name="LogLevel_BirdnetRecordingService">
+                    <select class="testbtn" id="LogLevel_BirdnetRecordingService" name="LogLevel_BirdnetRecordingService">
                         <option value="error" <?php echo $newconfig['LogLevel_BirdnetRecordingService'] == "error" || !array_key_exists('LogLevel_BirdnetRecordingService', $newconfig) ? "selected=''" : "" ?>>
                             Errors Only
                         </option>
@@ -529,7 +529,7 @@ foreach($formats as $format){
             </tr>
             <tr>
                 <td>Live Audio Stream:
-                    <select id="LogLevel_LiveAudioStreamService" name="LogLevel_LiveAudioStreamService">
+                    <select class="testbtn" id="LogLevel_LiveAudioStreamService" name="LogLevel_LiveAudioStreamService">
                         <option value="error" <?php echo $newconfig['LogLevel_LiveAudioStreamService'] == "error" || !array_key_exists('LogLevel_LiveAudioStreamService', $newconfig) ? "selected=''" : "" ?>>
                             Errors Only
                         </option>
@@ -547,7 +547,7 @@ foreach($formats as $format){
             </tr>
             <tr>
                 <td>Spectrogram Service:
-                    <select id="LogLevel_SpectrogramViewerService" name="LogLevel_SpectrogramViewerService">
+                    <select class="testbtn" id="LogLevel_SpectrogramViewerService" name="LogLevel_SpectrogramViewerService">
                         <option value="error" <?php echo $newconfig['LogLevel_SpectrogramViewerService'] == "error" || !array_key_exists('LogLevel_SpectrogramViewerService', $newconfig) ? "selected=''" : "" ?>>
                             Errors Only
                         </option>
