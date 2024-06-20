@@ -65,10 +65,10 @@ if (get_included_files()[0] === __FILE__) {
    <form action="views.php" method="GET">
     <input type="hidden" name="sort" value="<?php if(isset($_GET['sort'])){echo $_GET['sort'];}?>">
       <input type="hidden" name="view" value="Species Stats">
-      <button <?php if(!isset($_GET['sort']) || $_GET['sort'] == "alphabetical"){ echo "style='background:#9fe29b !important;'"; }?> class="sortbutton" type="submit" name="sort" value="alphabetical">
+      <button <?php if(!isset($_GET['sort']) || $_GET['sort'] == "alphabetical"){ echo "class='active !important;'"; }?> class="sortbutton" type="submit" name="sort" value="alphabetical">
          <img src="images/sort_abc.svg" title="Sort by alphabetical" alt="Sort by alphabetical">
       </button>
-      <button <?php if(isset($_GET['sort']) && $_GET['sort'] == "occurrences"){ echo "style='background:#9fe29b !important;'"; }?> class="sortbutton" type="submit" name="sort" value="occurrences">
+      <button <?php if(isset($_GET['sort']) && $_GET['sort'] == "occurrences"){ echo "class='active !important;'"; }?> class="sortbutton" type="submit" name="sort" value="occurrences">
          <img src="images/sort_occ.svg" title="Sort by occurrences" alt="Sort by occurrences">
       </button>
    </form>
