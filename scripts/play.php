@@ -400,7 +400,7 @@ if(!isset($_GET['species']) && !isset($_GET['filename'])){
 <div class="play">
 <?php if($view == "byspecies" || $view == "date") { ?>
 <div style="width: auto;
-   text-align: center"> 
+   text-align: center" class="sortbutton"> 
    <form action="views.php" method="GET">
       <input type="hidden" name="view" value="Recordings">
       <input type="hidden" name="<?php echo $view; ?>" value="<?php echo $_GET['date']; ?>">
@@ -512,7 +512,7 @@ for ($row = 0; $row < $num_rows; $row++) {
 #Specific Species
 if(isset($_GET['species'])){ ?>
 <div style="width: auto;
-   text-align: center">
+   text-align: center" class="sortbutton">
    <form action="views.php" method="GET">
       <input type="hidden" name="view" value="Recordings">
       <input type="hidden" name="species" value="<?php echo $_GET['species']; ?>">
