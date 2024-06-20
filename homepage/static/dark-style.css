@@ -674,7 +674,7 @@ button:hover {
   color: #6EBE64;
 }
 
-.sortbutton active {
+.sortbutton.active {
   background-color: #000000;
   color: #F3CA40;
 }
