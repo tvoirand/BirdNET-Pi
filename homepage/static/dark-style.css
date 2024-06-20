@@ -670,13 +670,13 @@ button:hover {
 }
 
 .sortbutton button:hover {
-  background-color: #00FFFF;
-  color: #108810;
+  background-color: #007D7D;
+  color: #6EBE64;
 }
 
 .sortbutton button.active {
   background-color: #000000;
-  color: #f5d214;
+  color: #F3CA40;
 }
 
 button.legacyview {
