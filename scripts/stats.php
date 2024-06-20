@@ -61,7 +61,7 @@ if (get_included_files()[0] === __FILE__) {
 <div class="stats">
 <div class="column">
   <div style="width: auto;
-   text-align: center">
+   text-align: center" class="sortbutton">
    <form action="views.php" method="GET">
     <input type="hidden" name="sort" value="<?php if(isset($_GET['sort'])){echo $_GET['sort'];}?>">
       <input type="hidden" name="view" value="Species Stats">
