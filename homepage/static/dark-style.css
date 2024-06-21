@@ -767,17 +767,18 @@ input {
 
 dialog {
   border:none;
+  background-color:rgba(59, 59, 59, 0.9);
 }
 
 dialog::backdrop {
   background: repeating-linear-gradient(
     30deg,
-    rgba(24, 194, 236, 0.2),
-    rgba(24, 194, 236, 0.2) 1px,
-    rgba(24, 194, 236, 0.3) 1px,
-    rgba(24, 194, 236, 0.3) 20px
+    rgba(30, 50, 80, 0.2),
+    rgba(30, 50, 80, 0.2) 1px,
+    rgba(30, 50, 80, 0.3) 1px,
+    rgba(30, 50, 80, 0.3) 20px
   );
-  backdrop-filter: blur(1px);
+  backdrop-filter: blur(3px);
 }
 
 .centered_image_container {
