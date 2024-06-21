@@ -30,6 +30,7 @@ iframe {
   height: 85%;
   width: 100%;
   position: fixed;
+  background-color: grey;
 }
 
 body {
