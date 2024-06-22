@@ -1,3 +1,4 @@
+
 @font-face {
    font-family: 'Roboto Flex' ;
    src: url('static/RobotoFlex-Regular.ttf') format('truetype');
@@ -480,7 +481,7 @@ button:hover {
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background: #04AA6D;
+  background: #9b9b9b;
   cursor: pointer;
 }
 
@@ -488,7 +489,7 @@ button:hover {
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background: #04AA6D;
+  background: #9b9b9b;
   cursor: pointer;
 }
 
