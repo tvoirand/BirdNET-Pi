@@ -32,7 +32,8 @@ if(isset($_GET['deletefile'])) {
     echo "Error - file deletion failed : " . implode(", ", $output) . "<br>";
   }
   $result1 = $statement1->execute();
-  if ($result1 === false || $db_writable->changes() === 0) {
+  if ($result1 === false || $db_writable
+->changes() === 0) {
     echo "Error - database line deletion failed : " . $db_writable->lastErrorMsg();
   }
   $db_writable->close();
@@ -399,8 +400,8 @@ if(!isset($_GET['species']) && !isset($_GET['filename'])){
 ?>
 <div class="play">
 <?php if($view == "byspecies" || $view == "date") { ?>
-  <div style="width: auto;
-   text-align: center"> 
+<div style="width: auto;
+   text-align: center">
    <form action="views.php" method="GET">
       <input type="hidden" name="view" value="Recordings">
       <input type="hidden" name="<?php echo $view; ?>" value="<?php echo $_GET['date']; ?>">
