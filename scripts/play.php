@@ -32,8 +32,7 @@ if(isset($_GET['deletefile'])) {
     echo "Error - file deletion failed : " . implode(", ", $output) . "<br>";
   }
   $result1 = $statement1->execute();
-  if ($result1 === false || $db_writable
-->changes() === 0) {
+  if ($result1 === false || $db_writable->changes() === 0) {
     echo "Error - database line deletion failed : " . $db_writable->lastErrorMsg();
   }
   $db_writable->close();
