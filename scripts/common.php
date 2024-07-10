@@ -236,6 +236,8 @@ class Flickr {
       }
     }
 
+    if ($photo === null) return;
+
     $license_url = "https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=" . $this->flickr_api_key . "&photo_id=" . $photo["id"] . "&format=json&nojsoncallback=1";
     $license_response = file_get_contents($license_url);
     $license_id = json_decode($license_response, true)["photo"]["license"];
