@@ -46,6 +46,17 @@ def show_values_on_bars(ax, label):
         ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
 
 
+def wrap_width(txt):
+    # try to estimate wrap width
+    w = 16
+    for c in txt:
+        if c in ['M', 'm', 'W', 'w']:
+            w -= 0.33
+        if c in ['I', 'i', 'j', 'l']:
+            w += 0.33
+    return round(w)
+
+
 def create_plot(df_plt_today, now, is_top=None):
     if is_top is not None:
         readings = 10
@@ -97,7 +108,7 @@ def create_plot(df_plt_today, now, is_top=None):
     show_values_on_bars(axs[0], confmax)
 
     # Try plot grid lines between bars - problem at the moment plots grid lines on bars - want between bars
-    yticklabels = ['\n'.join(textwrap.wrap(ticklabel.get_text(), 16)) for ticklabel in plot.get_yticklabels()]
+    yticklabels = ['\n'.join(textwrap.wrap(ticklabel.get_text(), wrap_width(ticklabel.get_text()))) for ticklabel in plot.get_yticklabels()]
     # Next two lines avoid a UserWarning on set_ticklabels() requesting a fixed number of ticks
     yticks = plot.get_yticks()
     plot.set_yticks(yticks)
