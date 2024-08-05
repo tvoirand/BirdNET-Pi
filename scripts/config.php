@@ -147,7 +147,6 @@ if(isset($_GET["latitude"])){
     }
   }
 
-
   $contents = file_get_contents("/etc/birdnet/birdnet.conf");
   $contents = preg_replace("/SITE_NAME=.*/", "SITE_NAME=\"$site_name\"", $contents);
   $contents = preg_replace("/LATITUDE=.*/", "LATITUDE=$latitude", $contents);
@@ -176,6 +175,10 @@ if(isset($_GET["latitude"])){
     function() {
       window.parent.document.location.reload();
     }, 1000);</script>";
+
+    shell_exec("sudo systemctl restart chart_viewer.service");
+    // the sleep allows for the service to restart and image to be generated
+    sleep(5);
   }
 
   $fh = fopen("/etc/birdnet/birdnet.conf", "w");
@@ -649,6 +652,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
 
       <table class="settingstable"><tr><td>
       <h2>Color scheme </h2>
+      Note: when changing themes the daily chart may need a page refresh before updating.<br><br>
       <label for="color_scheme">Color scheme for the site : </label>
       <select name="color_scheme" class="testbtn">
       <?php
