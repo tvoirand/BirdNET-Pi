@@ -114,6 +114,7 @@ def main():
         return
 
     # Loop through recent detections
+    log.info("Checking if recent detections are present in BirdWeather")
     df = get_recent_detections()
     for row in df.itertuples():
 
@@ -138,6 +139,8 @@ def main():
                 for d in birdweather_detections
             ]
         ):
+
+            log.info(f"Detection not in BirdWeather: {row.File_Name}")
 
             # Post soundscape to birdweather
             soundscape_id = post_birdweather_soundscape(
