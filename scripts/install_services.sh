@@ -55,6 +55,25 @@ EOF
   systemctl enable birdnet_analysis.service
 }
 
+install_birdweather_publication() {
+  cat << EOF > $HOME/BirdNET-Pi/templates/birdweather_publication.service
+[Unit]
+Description=BirdWeather Publication
+After=network-online.target
+Wants=network-online.target
+[Service]
+Restart=always
+Type=simple
+RestartSec=60
+User=${USER}
+ExecStart=$PYTHON_VIRTUAL_ENV /usr/local/bin/birdweather_publication.py
+[Install]
+WantedBy=multi-user.target
+EOF
+  ln -sf $HOME/BirdNET-Pi/templates/birdweather_publication.service /usr/lib/systemd/system
+  systemctl enable birdweather_publication.service
+}
+
 create_necessary_dirs() {
   echo "Creating necessary directories"
   [ -d ${EXTRACTED} ] || sudo -u ${USER} mkdir -p ${EXTRACTED}
