@@ -176,7 +176,7 @@ def main():
                     conf["EXTRACTED"],
                     "By_Date",
                     soundscape_datetime.strftime("%Y-%m-%d"),
-                    row.Com_Name.replace(" ", "_"),
+                    row.Com_Name.replace(" ", "_").replace("'", ""),
                     row.File_Name,
                 ),
             )
@@ -187,7 +187,7 @@ def main():
                     conf["EXTRACTED"],
                     "By_Date",
                     soundscape_datetime.strftime("%Y-%m-%d"),
-                    row.Com_Name.replace(" ", "_"),
+                    row.Com_Name.replace(" ", "_").replace("'", ""),
                     row.File_Name,
                 )
             )
