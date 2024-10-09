@@ -142,14 +142,11 @@ def main():
     df = get_recent_detections()
     for row in df.itertuples():
 
-        ic("Processing row: ", row)
-
         soundscape_datetime = datetime.datetime.strptime(
             f"{row.Date} {row.Time}", "%Y-%m-%d %H:%M:%S"
         ).astimezone(get_localzone())
         full_length_soundscape_duration = int(conf["RECORDING_LENGTH"])
         species_id = get_birdweather_species_id(row.Sci_Name, row.Com_Name)
-        ic(soundscape_datetime, full_length_soundscape_duration, species_id)
 
         # Lookup detections present in BirdWeather within timeframe of this detection's soundscape
         birdweather_detections = lookup_birdweather_detections(
@@ -158,7 +155,6 @@ def main():
             soundscape_datetime,
             full_length_soundscape_duration,
         )
-        ic(birdweather_detections)
 
         # This detection's species is not present in BirdWeather
         if not any(
@@ -180,7 +176,6 @@ def main():
                     row.File_Name,
                 ),
             )
-            ic("Posted soundscape: ", soundscape_id)
 
             soundscape_subset_duration = librosa.get_duration(
                 path=os.path.join(
@@ -210,18 +205,11 @@ def main():
                 ),
                 "confidence": row.Confidence,
             }
-            ic("Posting detection: ", data)
             try:
                 resp = requests.post(url=detections_url, json=data, timeout=20)
                 log.info(f"Detection POST Response Status - {resp.status_code:d}")
             except BaseException as e:
                 log.error(f"Cannot POST detection: {e}")
-
-            ic(
-                "Successfully posted detection: ",
-                soundscape_datetime.isoformat(),
-                row.Sci_Name,
-            )
 
 
 if __name__ == "__main__":
