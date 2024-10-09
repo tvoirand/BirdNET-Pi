@@ -69,31 +69,6 @@ def lookup_birdweather_detections(
     return data["detections"]
 
 
-def lookup_birdweather_soundscapes(
-    birdweather_id: str,
-    species_id: int,
-    soundscape_datetime: datetime.datetime,
-    soundscape_duration: float,
-) -> List[Dict[str, Any]]:
-    soundscapes_url = (
-        f"https://app.birdweather.com/api/v1/stations/{birdweather_id}/soundscapes"
-    )
-    resp = requests.get(
-        url=soundscapes_url,
-        data={
-            "from": soundscape_datetime.isoformat(),
-            "to": (
-                soundscape_datetime + datetime.timedelta(seconds=soundscape_duration)
-            ).isoformat(),
-            "speciesId": species_id,
-        },
-    )
-    data = json.loads(resp.text)
-    if not data["success"]:
-        raise LookupError("Could not lookup soundscapes from BirdWeather")
-    return data["soundscapes"]
-
-
 def post_birdweather_soundscape(
     birdweather_id: str, soundscape_datetime: datetime.datetime, soundscape_file: str
 ) -> int:
