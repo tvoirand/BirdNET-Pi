@@ -147,24 +147,16 @@ def main():
         soundscape_datetime = datetime.datetime.strptime(
             f"{row.Date} {row.Time}", "%Y-%m-%d %H:%M:%S"
         ).astimezone(get_localzone())
-        soundscape_duration = librosa.get_duration(
-            filename=os.path.join(
-                conf["EXTRACTED"],
-                "By_Date",
-                soundscape_datetime.strftime("%Y-%m-%d"),
-                row.Com_Name.replace(" ", "_"),
-                row.File_Name,
-            )
-        )
+        full_length_soundscape_duration = int(conf["RECORDING_LENGTH"])
         species_id = get_birdweather_species_id(row.Sci_Name, row.Com_Name)
-        ic(soundscape_datetime, soundscape_duration, species_id)
+        ic(soundscape_datetime, full_length_soundscape_duration, species_id)
 
         # Lookup detections present in BirdWeather within timeframe of this detection's soundscape
         birdweather_detections = lookup_birdweather_detections(
             conf["BIRDWEATHER_ID"],
             species_id,
             soundscape_datetime,
-            soundscape_duration,
+            full_length_soundscape_duration,
         )
         ic(birdweather_detections)
 
@@ -176,34 +168,29 @@ def main():
             ]
         ):
 
-            # Lookup BirdWeather soundscape
-            birdweather_soundscapes = lookup_birdweather_soundscapes(
+            # Post soundscape to birdweather
+            soundscape_id = post_birdweather_soundscape(
                 conf["BIRDWEATHER_ID"],
-                species_id,
                 soundscape_datetime,
-                soundscape_duration,
+                os.path.join(
+                    conf["EXTRACTED"],
+                    "By_Date",
+                    soundscape_datetime.strftime("%Y-%m-%d"),
+                    row.Com_Name.replace(" ", "_"),
+                    row.File_Name,
+                ),
             )
-            ic(birdweather_soundscapes)
-            if len(birdweather_soundscapes) == 1:
-                soundscape_id = birdweather_soundscapes[0]["id"]
-            elif len(birdweather_soundscapes) > 1:
-                log.error("Found several soundscapes in BirdWeather for this detection")
-                continue
-            elif (
-                len(birdweather_soundscapes) == 0
-            ):  # If soundscape not present, post it
-                soundscape_id = post_birdweather_soundscape(
-                    conf["BIRDWEATHER_ID"],
-                    soundscape_datetime,
-                    os.path.join(
-                        conf["EXTRACTED"],
-                        "By_Date",
-                        soundscape_datetime.strftime("%Y-%m-%d"),
-                        row.Com_Name.replace(" ", "_"),
-                        row.File_Name,
-                    ),
+            ic("Posted soundscape: ", soundscape_id)
+
+            soundscape_subset_duration = librosa.get_duration(
+                filename=os.path.join(
+                    conf["EXTRACTED"],
+                    "By_Date",
+                    soundscape_datetime.strftime("%Y-%m-%d"),
+                    row.Com_Name.replace(" ", "_"),
+                    row.File_Name,
                 )
-                ic("Posted soundscape: ", soundscape_id)
+            )
 
             detections_url = f"https://app.birdweather.com/api/v1/stations/{conf['BIRDWEATHER_ID']}/detections"
             # TODO: Find out how to get actual detection start and end times, store them in DB?
@@ -213,7 +200,7 @@ def main():
                 "lon": conf["LONGITUDE"],
                 "soundscapeId": soundscape_id,
                 "soundscapeStartTime": 0.0,
-                "soundscapeEndTime": soundscape_duration,
+                "soundscapeEndTime": soundscape_subset_duration,
                 "commonName": row.Com_Name,
                 "scientificName": row.Sci_Name,
                 "algorithm": (
