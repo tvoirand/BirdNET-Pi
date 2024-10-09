@@ -183,7 +183,7 @@ def main():
             ic("Posted soundscape: ", soundscape_id)
 
             soundscape_subset_duration = librosa.get_duration(
-                filename=os.path.join(
+                path=os.path.join(
                     conf["EXTRACTED"],
                     "By_Date",
                     soundscape_datetime.strftime("%Y-%m-%d"),
