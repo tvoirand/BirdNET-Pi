@@ -66,7 +66,7 @@ Type=oneshot
 User=${USER}
 ExecStart=$PYTHON_VIRTUAL_ENV /usr/local/bin/birdweather_publication.py
 [Install]
-WantedBy=multi-user.target
+WantedBy=network-online.target
 EOF
   ln -sf $HOME/BirdNET-Pi/templates/birdweather_publication.service /usr/lib/systemd/system
   systemctl enable birdweather_publication.service
