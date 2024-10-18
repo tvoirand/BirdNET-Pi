@@ -62,9 +62,7 @@ Description=BirdWeather Publication
 After=network-online.target
 Wants=network-online.target
 [Service]
-Restart=always
-Type=simple
-RestartSec=60
+Type=oneshot
 User=${USER}
 ExecStart=$PYTHON_VIRTUAL_ENV /usr/local/bin/birdweather_publication.py
 [Install]
