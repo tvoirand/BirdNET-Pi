@@ -20,7 +20,7 @@ install_depends() {
   apt install -qqy caddy sqlite3 php-sqlite3 php-fpm php-curl php-xml php-zip php icecast2 \
     pulseaudio avahi-utils sox libsox-fmt-mp3 alsa-utils ffmpeg \
     wget curl unzip bc \
-    python3-pip python3-venv lsof net-tools inotify-tools
+    python3-pip python3-venv lsof net-tools inotify-tools networkd-dispatcher
 }
 
 set_hostname() {
@@ -56,20 +56,33 @@ EOF
 }
 
 install_birdweather_publication() {
-  cat << EOF > $HOME/BirdNET-Pi/templates/birdweather_publication.service
+  cat << EOF > $HOME/BirdNET-Pi/templates/birdweather_publication@.service
 [Unit]
-Description=BirdWeather Publication
+Description=BirdWeather Publication for %i interface
 After=network-online.target
 Wants=network-online.target
 [Service]
 Type=oneshot
 User=${USER}
+ExecStartPre= /bin/sh -c 'n=0; until curl --silent --head --fail https://app.birdweather.com || [ $n -ge 30 ]; do n=$((n+1)); sleep 5; done;'
 ExecStart=$PYTHON_VIRTUAL_ENV /usr/local/bin/birdweather_publication.py
-[Install]
-WantedBy=network-online.target
 EOF
-  ln -sf $HOME/BirdNET-Pi/templates/birdweather_publication.service /usr/lib/systemd/system
-  systemctl enable birdweather_publication.service
+  cat << EOF > $HOME/BirdNET-Pi/templates/50-birdweather-publication
+#!/bin/bash
+UNIT_NAME="birdweather_publication@$IFACE.service"
+# Check if the service is active and then start it
+if systemctl is-active --quiet "$UNIT_NAME"; then
+    echo "$UNIT_NAME is already running."
+else
+    echo "Starting $UNIT_NAME..."
+    systemctl start "$UNIT_NAME"
+fi
+EOF
+  chmod +x $HOME/BirdNET-Pi/templates/50-birdweather-publication
+  chown root:root $HOME/BirdNET-Pi/templates/50-birdweather-publication
+  ln -sf $HOME/BirdNET-Pi/templates/50-birdweather-publication /etc/networkd-dispatcher/routable.d
+  ln -sf $HOME/BirdNET-Pi/templates/birdweather_publication@.service /usr/lib/systemd/system
+  systemctl enable systemd-networkd
 }
 
 create_necessary_dirs() {
@@ -427,6 +440,7 @@ install_services() {
   install_Caddyfile
   install_avahi_aliases
   install_birdnet_analysis
+  install_birdweather_publication
   install_birdnet_stats_service
   install_recording_service
   install_custom_recording_service # But does not enable
