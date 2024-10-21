@@ -7,7 +7,7 @@ import logging
 import os
 import sqlite3
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import librosa
 import pandas as pd
@@ -19,10 +19,43 @@ from utils.helpers import DB_PATH, get_settings
 log = logging.getLogger(__name__)
 
 
-def get_recent_detections(start_datetime: datetime.datetime = None) -> pd.DataFrame:
-    # TODO: Clarify when to start looking through detections. Use date of last run?
-    if start_datetime is None:
-        start_datetime = datetime.datetime.now() - datetime.timedelta(days=3)
+def get_last_run_time(script_name: str) -> Optional[datetime.datetime]:
+    """Fetch the last run time for the given script from the metadata table."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT last_run FROM scripts_metadata WHERE script_name = ?", (script_name,)
+    )
+    row = cursor.fetchone()
+
+    conn.close()
+
+    if row:
+        return datetime.datetime.fromisoformat(row[0])
+    return None
+
+
+def update_last_run_time(script_name: str):
+    """Update the last run time for the given script to the current time."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    current_time = datetime.datetime.now().isoformat()
+
+    cursor.execute(
+        """
+        INSERT INTO scripts_metadata (script_name, last_run) VALUES (?, ?)
+        ON CONFLICT(script_name) DO UPDATE SET last_run = excluded.last_run;
+        """,
+        (script_name, current_time),
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def get_recent_detections(start_datetime: datetime.datetime) -> pd.DataFrame:
     conn = sqlite3.connect(DB_PATH)
     df = pd.read_sql_query(
         f"SELECT * from detections WHERE Date > DATE('{start_datetime.strftime('%Y-%m-%d')}')",
@@ -113,9 +146,16 @@ def main():
     if conf["BIRDWEATHER_ID"] == "":
         return
 
+    # Get recent detections (defaults to 7 days if no record is found)
+    last_run_time = get_last_run_time(script_name=os.path.realpath(__file__).name) or (
+        datetime.datetime.now() - datetime.timedelta(days=7)
+    )
+    df = get_recent_detections(last_run_time)
+
     # Loop through recent detections
-    log.info("Checking if recent detections are present in BirdWeather")
-    df = get_recent_detections()
+    log.info(
+        f"Checking if recent detections are present in BirdWeather since {last_run_time}"
+    )
     for row in df.itertuples():
 
         soundscape_datetime = datetime.datetime.strptime(
@@ -188,6 +228,8 @@ def main():
                 log.info(f"Detection POST Response Status - {resp.status_code:d}")
             except BaseException as e:
                 log.error(f"Cannot POST detection: {e}")
+
+    update_last_run_time(script_name=os.path.realpath(__file__).name)
 
 
 if __name__ == "__main__":
