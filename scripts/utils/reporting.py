@@ -70,7 +70,12 @@ def extract_detection(file: ParseFileName, detection: Detection):
         log.warning('Extraction exists. Moving on: %s', new_file)
     else:
         os.makedirs(new_dir, exist_ok=True)
-        extract_safe(file.file_name, new_file, detection.start, detection.stop)
+        extract_safe(
+            file.file_name,
+            new_file,
+            (detection.start_datetime - file.file_date).seconds,
+            (detection.stop_datetime - file.file_date).seconds,
+        )
         spectrogram(new_file, detection.common_name, new_file.replace(os.path.expanduser('~/'), ''))
     return new_file
 
@@ -130,7 +135,7 @@ def write_to_json_file(file: ParseFileName, detections: [Detection]):
     json_file = f'{file.file_name}.json'
     log.debug(f'WRITING RESULTS TO {json_file}')
     dets = {'file_name': os.path.basename(json_file), 'timestamp': file.iso8601, 'delay': conf['RECORDING_LENGTH'],
-            'detections': [{"start": det.start, "common_name": det.common_name, "confidence": det.confidence} for det in
+            'detections': [{"start": (det.start_datetime - file.file_date).seconds, "common_name": det.common_name, "confidence": det.confidence} for det in
                            detections]}
     with open(json_file, 'w') as rfile:
         rfile.write(json.dumps(dets))
@@ -184,12 +189,18 @@ def bird_weather(file: ParseFileName, detections: [Detection]):
             # POST detection to server
             detection_url = f'https://app.birdweather.com/api/v1/stations/{conf["BIRDWEATHER_ID"]}/detections'
 
-            data = {'timestamp': detection.iso8601, 'lat': conf['LATITUDE'], 'lon': conf['LONGITUDE'],
-                    'soundscapeId': soundscape_id,
-                    'soundscapeStartTime': detection.start, 'soundscapeEndTime': detection.stop,
-                    'commonName': detection.common_name, 'scientificName': detection.scientific_name,
-                    'algorithm': '2p4' if conf['MODEL'] == 'BirdNET_GLOBAL_6K_V2.4_Model_FP16' else 'alpha',
-                    'confidence': detection.confidence}
+            data = {
+                'timestamp': detection.iso8601,
+                'lat': conf['LATITUDE'],
+                'lon': conf['LONGITUDE'],
+                'soundscapeId': soundscape_id,
+                'soundscapeStartTime': (detection.start_datetime - file.file_date).seconds,
+                'soundscapeEndTime': (detection.stop_datetime - file.file_date).seconds,
+                'commonName': detection.common_name,
+                'scientificName': detection.scientific_name,
+                'algorithm': '2p4' if conf['MODEL'] == 'BirdNET_GLOBAL_6K_V2.4_Model_FP16' else 'alpha',
+                'confidence': detection.confidence,
+            }
 
             log.debug(data)
             try:
