@@ -28,7 +28,7 @@ get_tf_whl () {
       WHL=tflite_runtime-2.11.0-cp312-cp312-linux_x86_64.whl
       ;;
     *)
-      echo "No tflite version found"
+      echo "No tflite version found for ${ARCH}-${PY_VERSION}"
       WHL=''
       ;;
   esac
