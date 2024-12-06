@@ -12,8 +12,8 @@ from inotify.constants import IN_CLOSE_WRITE
 
 from server import load_global_model, run_analysis
 from utils.helpers import get_settings, ParseFileName, get_wav_files, ANALYZING_NOW, setup_logging
-from utils.reporting import extract_detection, summary, write_to_file, write_to_db, apprise, bird_weather, heartbeat, \
-    update_json_file
+from utils.reporting import extract_detection, summary, write_to_file, write_to_db, apprise, \
+    post_current_detections_to_birdweather, heartbeat, update_json_file
 
 shutdown = False
 
@@ -114,7 +114,7 @@ def handle_reporting_queue(queue):
                 write_to_file(file, detection)
                 write_to_db(file, detection)
             apprise(file, detections)
-            bird_weather(file, detections)
+            post_current_detections_to_birdweather(file, detections)
             heartbeat()
             os.remove(file.file_name)
         except BaseException as e:
