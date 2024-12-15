@@ -80,7 +80,7 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 User=${USER}
-ExecStartPre= /bin/sh -c 'n=0; until curl --silent --head --fail https://app.birdweather.com || [ \$n -ge 30 ]; do n=\$((n+1)); sleep 5; done;'
+ExecStartPre= /bin/sh -c 'n=0; until curl --silent --head --fail https://app.birdweather.com >/dev/null || [ \$n -ge 30 ]; do n=\$((n+1)); sleep 5; done;'
 ExecStart=$PYTHON_VIRTUAL_ENV /usr/local/bin/birdweather_past_publication.py
 EOF
   cat << EOF > $HOME/BirdNET-Pi/templates/50-birdweather-past-publication
