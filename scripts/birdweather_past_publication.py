@@ -56,10 +56,12 @@ def update_last_run_time(script_name: str):
 def get_detections_since(start_datetime: datetime.datetime) -> pd.DataFrame:
     """Get detections from the database that occurred after the specified date."""
     conn = sqlite3.connect(DB_PATH)
-    df = pd.read_sql_query(
-        f"SELECT * from detections WHERE Date > DATE('{start_datetime.strftime('%Y-%m-%d')}')",
-        conn,
+    query = (
+        "SELECT * FROM detections "
+        "WHERE DATETIME(Date || ' ' || Time) > "
+        f"DATETIME('{start_datetime.strftime('%Y-%m-%d %H:%M:%S')}')"
     )
+    df = pd.read_sql_query(query, conn)
     conn.close()
     return df
 
