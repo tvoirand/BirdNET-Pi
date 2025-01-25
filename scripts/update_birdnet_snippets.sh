@@ -193,6 +193,11 @@ if [ "$(grep -o "#birdnet" /etc/crontab | wc -l)" -lt 5 ]; then
   sed "s/\$USER/$USER/g" "$HOME"/BirdNET-Pi/templates/weekly_report.cron >> /etc/crontab
 fi
 
+set +x
+AUTH=$(grep basicauth /etc/caddy/Caddyfile)
+[ -n "${CADDY_PWD}" ] && [ -z "${AUTH}" ] && sudo /usr/local/bin/update_caddyfile.sh > /dev/null 2>&1
+set -x
+
 # update snippets above
 
 systemctl daemon-reload
