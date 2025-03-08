@@ -6,7 +6,8 @@ from numpy import ma
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
-from datetime import timedelta
+from datetime import datetime, timedelta
+from dateutil import tz
 import sqlite3
 from sqlite3 import Connection
 import plotly.express as px
@@ -188,11 +189,12 @@ def sunrise_sunset_scatter(date_range):
     sunset_text_list = []
     daysback_range = []
 
-    current_date = start_date
+    local_timezone = tz.tzlocal()
 
     for current_date in date_range:
-        sun_rise = sun.get_local_sunrise_time(current_date)
-        sun_dusk = sun.get_local_sunset_time(current_date)
+        current_datetime = datetime.combine(current_date, datetime.min.time())
+        sun_rise = sun.get_sunrise_time(current_datetime, local_timezone)
+        sun_dusk = sun.get_sunset_time(current_datetime, local_timezone)
 
         sun_rise_time = float(sun_rise.hour) + float(sun_rise.minute) / 60.0
         sun_dusk_time = float(sun_dusk.hour) + float(sun_dusk.minute) / 60.0
