@@ -120,10 +120,6 @@ if ! which inotifywait &>/dev/null;then
   ensure_apt_updated
   apt-get -y install inotify-tools
 fi
-if ! which gcc &>/dev/null;then
-  ensure_apt_updated
-  apt-get -y install gcc python3-dev
-fi
 
 apprise_version=$($HOME/BirdNET-Pi/birdnet/bin/python3 -c "import apprise; print(apprise.__version__)")
 [[ $apprise_version != "1.9.0" ]] && sudo_with_user $HOME/BirdNET-Pi/birdnet/bin/pip3 install apprise==1.9.0
