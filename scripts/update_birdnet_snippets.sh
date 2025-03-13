@@ -133,7 +133,8 @@ version=$($HOME/BirdNET-Pi/birdnet/bin/python3 -c "import suntime; print(suntime
 tf_version=$($HOME/BirdNET-Pi/birdnet/bin/python3 -c "import tflite_runtime; print(tflite_runtime.__version__)")
 if [ "$tf_version" != "2.11.0" ]; then
   get_tf_whl
-  sudo_with_user $HOME/BirdNET-Pi/birdnet/bin/pip3 install $HOME/BirdNET-Pi/$WHL numpy==1.23.5
+  # include our numpy dependants so pip can figure out which numpy version to install
+  sudo_with_user $HOME/BirdNET-Pi/birdnet/bin/pip3 install $HOME/BirdNET-Pi/$WHL pandas librosa matplotlib
 fi
 
 ensure_python_package inotify inotify
