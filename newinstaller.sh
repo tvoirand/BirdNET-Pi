@@ -12,6 +12,12 @@ but would need to be aarch64."
   exit 1
 fi
 
+PY_VERSION=$(python3 -c "import sys; print(f'{sys.version_info[0]}{sys.version_info[1]}')")
+if [ "${PY_VERSION}" == "39" ] ;then
+  echo "### BirdNET-Pi requires a newer OS. Bullseye is deprecated, please use Bookworm. ###"
+  [ -z "${FORCE_BULLSEYE}" ] && exit
+fi
+
 # we require passwordless sudo
 sudo -K
 if ! sudo -n true; then
