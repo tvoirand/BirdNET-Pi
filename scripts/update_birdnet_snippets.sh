@@ -167,12 +167,12 @@ if ! [ -f "$HOME/BirdNET-Pi/templates/$TMP_MOUNT" ]; then
    chown $USER:$USER "$HOME/BirdNET-Pi/templates/$TMP_MOUNT"
 fi
 
-if ! grep '-P log' $HOME/BirdNET-Pi/templates/birdnet_log.service &>/dev/null;then
+if grep -q -e '-P log' $HOME/BirdNET-Pi/templates/birdnet_log.service ;then
   sed -i "s/-P log/--path log/" ~/BirdNET-Pi/templates/birdnet_log.service
   systemctl daemon-reload && restart_services.sh
 fi
 
-if ! grep '-P terminal' $HOME/BirdNET-Pi/templates/web_terminal.service &>/dev/null;then
+if grep -q -e '-P terminal' $HOME/BirdNET-Pi/templates/web_terminal.service ;then
   sed -i "s/-P terminal/--path terminal/" ~/BirdNET-Pi/templates/web_terminal.service
   systemctl daemon-reload && restart_services.sh
 fi
