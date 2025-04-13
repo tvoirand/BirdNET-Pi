@@ -180,7 +180,8 @@ if(isset($_GET['view'])){
       $str = preg_replace('/^\h*\v+/m', '', $str);
       file_put_contents("$file", "$str");
     }
-    include('./scripts/include_list.php');
+    $species_list="include";
+    include('./scripts/species_list.php');
   }
   if($_GET['view'] == "Excluded"){
     ensure_authenticated();
@@ -207,7 +208,8 @@ if(isset($_GET['view'])){
       $str = preg_replace('/^\h*\v+/m', '', $str);
       file_put_contents("$file", "$str");
     }
-    include('./scripts/exclude_list.php');
+    $species_list="exclude";
+    include('./scripts/species_list.php');
   }
   if($_GET['view'] == "Whitelisted"){
     ensure_authenticated();
@@ -234,7 +236,8 @@ if(isset($_GET['view'])){
       $str = preg_replace('/^\h*\v+/m', '', $str);
       file_put_contents("$file", "$str");
     }
-    include('./scripts/whitelist_list.php');
+    $species_list="whitelist";
+    include('./scripts/species_list.php');
   }
   if($_GET['view'] == "File"){
     echo "<iframe src='scripts/filemanager/filemanager.php'></iframe>";
