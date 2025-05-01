@@ -837,7 +837,7 @@ Calamonastes simplex_Gray Wren-Warbler
 Calamonastes stierlingi_Stierling's Wren-Warbler
 Calamospiza melanocorys_Lark Bunting
 Calandrella acutirostris_Hume's Lark
-Calandrella brachydactyla_Greater Short-toed Lark
+Calandrella brachydactyla_쇠종다리
 Calandrella cinerea_Red-capped Lark
 Calandrella dukhunensis_쇠종다리
 Calcarius lapponicus_긴발톱멧새
@@ -4562,7 +4562,7 @@ Phylloscopus montis_Yellow-breasted Warbler
 Phylloscopus neglectus_Plain Leaf Warbler
 Phylloscopus nitidus_Green Warbler
 Phylloscopus occipitalis_Western Crowned Warbler
-Phylloscopus occisinensis_Alpine Leaf Warbler
+Phylloscopus occisinensis_노랑배솔새사촌
 Phylloscopus ogilviegranti_Kloss's Leaf Warbler
 Phylloscopus olivaceus_Philippine Leaf Warbler
 Phylloscopus omeiensis_햇노랑솔새
@@ -4601,7 +4601,7 @@ Piaya melanogaster_Black-bellied Cuckoo
 Pica bottanensis_Black-rumped Magpie
 Pica hudsonia_Black-billed Magpie
 Pica nuttalli_Yellow-billed Magpie
-Pica pica_Eurasian Magpie
+Pica pica_까치
 Pica serica_까치
 Picoides arcticus_Black-backed Woodpecker
 Picoides dorsalis_American Three-toed Woodpecker
@@ -5792,7 +5792,7 @@ Sula leucogaster_갈색얼가니새
 Sula nebouxii_Blue-footed Booby
 Sula sula_붉은발얼가니새
 Surnia ulula_Northern Hawk Owl
-Surniculus dicruroides_Fork-tailed Drongo-Cuckoo
+Surniculus dicruroides_검은두견이
 Surniculus lugubris_검은두견이
 Surniculus velutinus_Philippine Drongo-Cuckoo
 Suthora nipalensis_Black-throated Parrotbill
@@ -5960,7 +5960,7 @@ Terpsiphone bourbonnensis_Mascarene Paradise-Flycatcher
 Terpsiphone cinnamomea_Rufous Paradise-Flycatcher
 Terpsiphone incei_북방긴꼬리딱새
 Terpsiphone mutata_Malagasy Paradise-Flycatcher
-Terpsiphone paradisi_Indian Paradise-Flycatcher
+Terpsiphone paradisi_북방긴꼬리딱새
 Terpsiphone rufiventer_Black-headed Paradise-Flycatcher
 Terpsiphone viridis_African Paradise-Flycatcher
 Tersina viridis_Swallow Tanager
@@ -6251,7 +6251,7 @@ Turdus maculirostris_Ecuadorian Thrush
 Turdus mandarinus_대륙검은지빠귀
 Turdus maranonicus_Marañon Thrush
 Turdus menachensis_Yemen Thrush
-Turdus merula_Eurasian Blackbird
+Turdus merula_대륙검은지빠귀
 Turdus migratorius_American Robin
 Turdus naumanni_노랑지빠귀
 Turdus nigrescens_Sooty Thrush
