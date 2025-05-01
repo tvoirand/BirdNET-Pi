@@ -566,6 +566,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
         $langs = array(
           'not-selected' => 'Not Selected',
           "af" => "Afrikaans",
+          "ar" => "Arabic",
           "ca" => "Catalan",
           "cs" => "Czech",
           "zh" => "Chinese",
@@ -582,17 +583,20 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
           "id" => "Indonesia",
           "it" => "Italian",
           "ja" => "Japanese",
+          "ko" => "Korean",
           "lv" => "Latvian",
           "lt" => "Lithuania",
           "no" => "Norwegian",
           "pl" => "Polish",
           "pt" => "Portugues",
+          "ro" => "Romanian",
           "ru" => "Russian",
           "sk" => "Slovak",
           "sl" => "Slovenian",
           "es" => "Spanish",
           "sv" => "Swedish",
           "th" => "Thai",
+          "tr" => "Turkish",
           "uk" => "Ukrainian"
         );
 
