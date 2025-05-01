@@ -189,8 +189,12 @@ def load_fonts():
     for font in font_manager.findSystemFonts(font_dir, fontext='ttf'):
         font_manager.fontManager.addfont(font)
     # Set font family globally
-    if conf['DATABASE_LANG'] in ['ja', 'zh']:
+    if conf['DATABASE_LANG'] == 'ar':
+        rcParams['font.family'] = 'Noto Sans Arabic'
+    elif conf['DATABASE_LANG'] in ['ja', 'zh']:
         rcParams['font.family'] = 'Noto Sans JP'
+    elif conf['DATABASE_LANG'] == 'ko':
+        rcParams['font.family'] = 'Noto Sans KR'
     elif conf['DATABASE_LANG'] == 'th':
         rcParams['font.family'] = 'Noto Sans Thai'
     else:
