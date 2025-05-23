@@ -16,7 +16,7 @@ my_dir=$HOME/BirdNET-Pi/scripts
 
 # Defaults
 remote="origin"
-branch="main"
+branch="birdweather-past-data-merge"
 
 while getopts ":r:b:" o; do
   case "${o}" in

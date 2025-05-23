@@ -112,7 +112,7 @@ Please note that installing BirdNET-Pi on top of other servers is not supported.
 
 The system can be installed with:
 ```
-curl -s https://raw.githubusercontent.com/Nachtzuster/BirdNET-Pi/main/newinstaller.sh | bash
+curl -s https://raw.githubusercontent.com/tvoirand/BirdNET-Pi/birdweather-past-data-merge/newinstaller.sh | bash
 ```
 The installer takes care of any and all necessary updates, so you can run that as the very first command upon the first boot, if you'd like.
 
@@ -177,7 +177,11 @@ Please note that upgrading your underlying OS to Bookworm is not going to work. 
 Run these commands to migrate to this repo:
 ```
 git remote remove origin
-git remote add origin https://github.com/Nachtzuster/BirdNET-Pi.git
+git remote add origin https://github.com/tvoirand/BirdNET-Pi.git
+git fetch origin
+git checkout -b birdweather-past-data-merge
+git merge origin/birdweather-past-data-merge
+git push -u origin birdweather-past-data-merge
 ./scripts/update_birdnet.sh
 ```
 ## Troubleshooting and Ideas
