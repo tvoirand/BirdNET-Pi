@@ -153,6 +153,19 @@ To restore:
 ./scripts/backup_data.sh -a restore -f /mnt/birds/backup-2024-07-09.tar
 ```
 
+## x86_64 support*
+***x86_64 is not supported.** Not officially anyway. It is mainly there for developers or otherwise more Linux savvy people.
+That being said, some pointers:
+- Use Debian 12
+- The user needs passwordless sudo
+
+For Proxmox, a user has reported adding this in their `cpu-models.conf`, in order for the custom TFLite build to work.
+```
+cpu-model: BirdNet
+    flags +sse4.1
+    reported-model host
+```
+
 ## Uninstallation
 ```
 /usr/local/bin/uninstall.sh && cd ~ && rm -drf BirdNET-Pi
@@ -181,6 +194,11 @@ I hope that if you find BirdNET-Pi has been worth your time, you will share your
 
 BirdNET-Pi can also be run as a [Homeassistant](https://www.home-assistant.io/) addon through docker.
 For more information : https://github.com/alexbelgium/hassio-addons/blob/master/birdnet-pi/README.md
+
+## Docker
+
+BirdNET-Pi can also be run as as a docker container.
+For more information : https://github.com/alexbelgium/hassio-addons/blob/master/birdnet-pi/README_standalone.md
 
 ## Cool Links
 
