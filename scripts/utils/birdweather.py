@@ -3,12 +3,36 @@
 import requests
 import logging
 import datetime
+import subprocess
+import tempfile
 
 import gzip
+import io
+import soundfile
 from typing import Any, Dict, List, Optional
 from .helpers import Detection
 
 log = logging.getLogger(__name__)
+
+
+def wav_to_flac(soundscape_file: str) -> bytes:
+    """Convert wav file to FLAC and compress."""
+    data, samplerate = soundfile.read(soundscape_file)
+    buf = io.BytesIO()
+    soundfile.write(buf, data, samplerate, format="FLAC")
+    flac_data = buf.getvalue()
+    return gzip.compress(flac_data)
+
+
+def mp3_to_flac(soundscape_file: str) -> bytes:
+    """Convert mp3 file to FLAC and compress."""
+    result = subprocess.run(
+        ["ffmpeg", "-i", soundscape_file, "-f", "flac", "pipe:1"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        check=True,
+    )
+    return gzip.compress(result.stdout)
 
 
 def get_birdweather_species_id(sci_name: str, com_name: str) -> int:
@@ -66,13 +90,20 @@ def post_soundscape_to_birdweather(
         f"https://app.birdweather.com/api/v1/stations/{birdweather_id}/"
         f"soundscapes?timestamp={detection_datetime.isoformat()}"
     )
-    with open(soundscape_file, "rb") as f:
-        mp3_data = f.read()
-    gzip_mp3_data = gzip.compress(mp3_data)
+    try:
+        if soundscape_file.endswith(".wav"):
+            gzip_flac_data = wav_to_flac(soundscape_file)
+        elif soundscape_file.endswith(".mp3"):
+            gzip_flac_data = mp3_to_flac(soundscape_file)
+        else:
+            raise ValueError(f"File extension not supported: {soundscape_file}")
+    except Exception as e:
+        log.error(f"Error during FLAC conversion: {e}")
+        return
     try:
         resp = requests.post(
             url=soundscape_url,
-            data=gzip_mp3_data,
+            data=gzip_flac_data,
             timeout=20,
             headers={
                 "Content-Type": "application/octet-stream",
@@ -96,23 +127,23 @@ def post_detection_to_birdweather(
     birdweather_id: str,
     latitude: float,
     longitude: float,
-    model: str
+    model: str,
 ):
     """Upload a detection to BirdWeather."""
 
-    detection_url = f'https://app.birdweather.com/api/v1/stations/{birdweather_id}/detections'
+    detection_url = f"https://app.birdweather.com/api/v1/stations/{birdweather_id}/detections"
 
     data = {
-        'timestamp': detection.iso8601,
-        'lat': latitude,
-        'lon': longitude,
-        'soundscapeId': soundscape_id,
-        'soundscapeStartTime': (detection.start_datetime - soundscape_datetime).seconds,
-        'soundscapeEndTime': (detection.stop_datetime - soundscape_datetime).seconds,
-        'commonName': detection.common_name,
-        'scientificName': detection.scientific_name,
-        'algorithm': '2p4' if model == 'BirdNET_GLOBAL_6K_V2.4_Model_FP16' else 'alpha',
-        'confidence': detection.confidence
+        "timestamp": detection.iso8601,
+        "lat": latitude,
+        "lon": longitude,
+        "soundscapeId": soundscape_id,
+        "soundscapeStartTime": (detection.start_datetime - soundscape_datetime).seconds,
+        "soundscapeEndTime": (detection.stop_datetime - soundscape_datetime).seconds,
+        "commonName": detection.common_name,
+        "scientificName": detection.scientific_name,
+        "algorithm": "2p4" if model == "BirdNET_GLOBAL_6K_V2.4_Model_FP16" else "alpha",
+        "confidence": detection.confidence,
     }
 
     log.debug(data)
