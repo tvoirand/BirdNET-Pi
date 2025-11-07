@@ -5,7 +5,6 @@ import logging
 import datetime
 import subprocess
 import tenacity
-import tempfile
 
 import gzip
 import io
