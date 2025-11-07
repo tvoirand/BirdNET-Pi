@@ -4,6 +4,7 @@ import requests
 import logging
 import datetime
 import subprocess
+import tenacity
 import tempfile
 
 import gzip
@@ -35,6 +36,11 @@ def mp3_to_flac(soundscape_file: str) -> bytes:
     return gzip.compress(result.stdout)
 
 
+@tenacity.retry(
+    reraise=True,
+    wait=tenacity.wait_exponential(),
+    stop=tenacity.stop_after_delay(90),
+)
 def get_birdweather_species_id(sci_name: str, com_name: str) -> int:
     """Lookup a BirdWeather species ID based on the species scientific and common names."""
     species_url = "https://app.birdweather.com/api/v1/species/lookup"
@@ -50,6 +56,11 @@ def get_birdweather_species_id(sci_name: str, com_name: str) -> int:
     return species["id"]
 
 
+@tenacity.retry(
+    reraise=True,
+    wait=tenacity.wait_exponential(),
+    stop=tenacity.stop_after_delay(90),
+)
 def query_birdweather_detections(
     birdweather_id: str,
     species_id: int,
@@ -72,6 +83,11 @@ def query_birdweather_detections(
     return data["detections"]
 
 
+@tenacity.retry(
+    reraise=True,
+    wait=tenacity.wait_exponential(),
+    stop=tenacity.stop_after_delay(90),
+)
 def post_soundscape(
     birdweather_id: str, detection_datetime: datetime.datetime, soundscape: bytes
 ) -> Optional[int]:
@@ -117,6 +133,11 @@ def convert_and_post_soundscape_to_birdweather(
     return soundscape_id
 
 
+@tenacity.retry(
+    reraise=True,
+    wait=tenacity.wait_exponential(),
+    stop=tenacity.stop_after_delay(90),
+)
 def post_detection_to_birdweather(
     detection: Detection,
     soundscape_id: str,
