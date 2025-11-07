@@ -13,7 +13,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from .helpers import get_settings, ParseFileName, Detection, get_font, DB_PATH
 from .notifications import sendAppriseNotifications
-from .birdweather import post_soundscape_to_birdweather, post_detection_to_birdweather
+from .birdweather import convert_and_post_soundscape_to_birdweather, post_detection_to_birdweather
 
 log = logging.getLogger(__name__)
 
@@ -180,23 +180,27 @@ def post_current_detections_to_birdweather(file: ParseFileName, detections: [Det
     if conf['BIRDWEATHER_ID'] == "":
         return
     if detections:
-        soundscape_id = post_soundscape_to_birdweather(
-            conf["BIRDWEATHER_ID"], file.file_date.astimezone(get_localzone()), file.file_name
-        )
-        if soundscape_id is None:
+        try:
+            soundscape_id = convert_and_post_soundscape_to_birdweather(
+                conf["BIRDWEATHER_ID"], file.file_date.astimezone(get_localzone()), file.file_name
+            )
+        except Exception as e:
+            log.error(f"Error posting soundscape {file.file_name} to BirdWeather: {e}")
             return
         for detection in detections:
-
-            post_detection_to_birdweather(
-                detection,
-                soundscape_id,
-                file.file_date,
-                conf["BIRDWEATHER_ID"],
-                conf['LATITUDE'],
-                conf['LONGITUDE'],
-                conf['MODEL'],
-            )
-
+            try:
+                post_detection_to_birdweather(
+                    detection,
+                    soundscape_id,
+                    file.file_date,
+                    conf["BIRDWEATHER_ID"],
+                    conf['LATITUDE'],
+                    conf['LONGITUDE'],
+                    conf['MODEL'],
+                )
+            except Exception as e:
+                log.error(f"Error posting detection {detection.Sci_Name} to BirdWeather: {e}")
+                continue
 
 def heartbeat():
     conf = get_settings()

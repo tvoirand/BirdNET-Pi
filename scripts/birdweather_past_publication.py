@@ -11,8 +11,12 @@ import librosa
 import pandas as pd
 from tzlocal import get_localzone
 from utils.helpers import DB_PATH, get_settings, setup_logging, Detection
-from utils.birdweather import get_birdweather_species_id, query_birdweather_detections, \
-    post_soundscape_to_birdweather, post_detection_to_birdweather
+from utils.birdweather import (
+    get_birdweather_species_id,
+    query_birdweather_detections,
+    convert_and_post_soundscape_to_birdweather,
+    post_detection_to_birdweather,
+)
 
 log = logging.getLogger(os.path.splitext(os.path.basename(os.path.realpath(__file__)))[0])
 
@@ -22,9 +26,7 @@ def get_last_run_time(script_name: str) -> Optional[datetime.datetime]:
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT last_run FROM scripts_metadata WHERE script_name = ?", (script_name,)
-    )
+    cursor.execute("SELECT last_run FROM scripts_metadata WHERE script_name = ?", (script_name,))
     result = cursor.fetchone()
 
     conn.close()
@@ -67,7 +69,6 @@ def get_detections_since(start_datetime: datetime.datetime) -> pd.DataFrame:
 
 
 def main():
-
     conf = get_settings()
     if conf["BIRDWEATHER_ID"] == "":
         return
@@ -79,11 +80,8 @@ def main():
     df = get_detections_since(last_run_time)
 
     # Loop through recent detections
-    log.info(
-        f"Checking if recent detections are present in BirdWeather since {last_run_time}"
-    )
+    log.info(f"Checking if recent detections are present in BirdWeather since {last_run_time}")
     for detection_entry in df.itertuples():
-
         detection_datetime = datetime.datetime.strptime(
             f"{detection_entry.Date} {detection_entry.Time}", "%Y-%m-%d %H:%M:%S"
         ).astimezone(get_localzone())
@@ -100,13 +98,13 @@ def main():
             )
         except Exception as e:
             log.error(
-                f"Script {os.path.basename(os.path.realpath(__file__))} stopped due to error: {e}"
+                f"Error querying BirdWeather detections for detection"
+                f" {detection_entry.Sci_Name} - {detection_datetime}: {e}"
             )
             return
 
         # This detection is not present in BirdWeather
         if birdweather_detections == []:
-
             log.info(f"Detection not in BirdWeather: {detection_entry.File_Name}")
 
             # Post extracted audio to BirdWeather as soundscape
@@ -117,11 +115,18 @@ def main():
                 detection_entry.Com_Name.replace(" ", "_").replace("'", ""),
                 detection_entry.File_Name,
             )
-            soundscape_id = post_soundscape_to_birdweather(
-                conf["BIRDWEATHER_ID"],
-                detection_datetime,
-                extracted_audio_file,
-            )
+            try:
+                soundscape_id = convert_and_post_soundscape_to_birdweather(
+                    conf["BIRDWEATHER_ID"],
+                    detection_datetime,
+                    extracted_audio_file,
+                )
+            except Exception as e:
+                log.error(
+                    f"Error posting soundscape {detection_entry.Sci_Name} - {detection_datetime}"
+                    f" to BirdWeather: {e}"
+                )
+                return
 
             # Get length of extracted audio file, will be useful to post detection to BirdWeather
             with warnings.catch_warnings():
@@ -137,21 +142,27 @@ def main():
                 f"{detection_entry.Sci_Name}_{detection_entry.Com_Name}",
                 detection_entry.Confidence,
             )
-            post_detection_to_birdweather(
-                detection,
-                soundscape_id,
-                detection_datetime,
-                conf["BIRDWEATHER_ID"],
-                conf['LATITUDE'],
-                conf['LONGITUDE'],
-                conf['MODEL'],
-            )
+            try:
+                post_detection_to_birdweather(
+                    detection,
+                    soundscape_id,
+                    detection_datetime,
+                    conf["BIRDWEATHER_ID"],
+                    conf["LATITUDE"],
+                    conf["LONGITUDE"],
+                    conf["MODEL"],
+                )
+            except Exception as e:
+                log.error(
+                    f"Error posting detection {detection_entry.Sci_Name} - {detection_datetime}"
+                    f" to BirdWeather: {e}"
+                )
+                return
 
     update_last_run_time(script_name=os.path.basename(os.path.realpath(__file__)))
 
 
 if __name__ == "__main__":
-
     setup_logging()
 
     main()
