@@ -136,6 +136,11 @@ if ! grep -E '^IMAGE_PROVIDER=' /etc/birdnet/birdnet.conf &>/dev/null;then
   echo "IMAGE_PROVIDER=${PROVIDER}" >> /etc/birdnet/birdnet.conf
 fi
 
+if grep -E '^DATABASE_LANG=zh$' /etc/birdnet/birdnet.conf &>/dev/null;then
+  sed -i --follow-symlinks -E 's/^DATABASE_LANG=zh/DATABASE_LANG=zh_CN/' /etc/birdnet/birdnet.conf
+  install_language_label.sh
+fi
+
 [ -d $RECS_DIR/StreamData ] || sudo_with_user mkdir -p $RECS_DIR/StreamData
 [ -L ${EXTRACTED}/spectrogram.png ] || sudo_with_user ln -sf ${RECS_DIR}/StreamData/spectrogram.png ${EXTRACTED}/spectrogram.png
 
@@ -224,7 +229,13 @@ fi
 
 if grep -q -e '-P terminal' $HOME/BirdNET-Pi/templates/web_terminal.service ; then
   sed -i "s/-P terminal/--path terminal/" ~/BirdNET-Pi/templates/web_terminal.service
-  systemctl daemon-reload && restart_services.sh
+  systemctl daemon-reload && systemctl restart web_terminal.service
+fi
+
+if grep -q -e ' login' $HOME/BirdNET-Pi/templates/web_terminal.service ; then
+  sed -i "s/ login/ bash -c 'read -p \"Login: \" username \&\& [[ \"\$username\" =~ ^[-_.a-z0-9]{1,30}\$ ]] \&\& su --pty -l \$username'/" ~/BirdNET-Pi/templates/web_terminal.service
+  sed -i "/\[Service\]/a User=$BIRDNET_USER" ~/BirdNET-Pi/templates/web_terminal.service
+  systemctl daemon-reload && systemctl restart web_terminal.service
 fi
 
 if grep -q -e 'Environment=XDG_RUNTIME_DIR=/run/user/' $HOME/BirdNET-Pi/templates/birdnet_recording.service; then
@@ -273,10 +284,10 @@ AUTH=$(grep basicauth /etc/caddy/Caddyfile)
 [ -n "${CADDY_PWD}" ] && [ -z "${AUTH}" ] && sudo /usr/local/bin/update_caddyfile.sh > /dev/null 2>&1
 set -x
 
-if ! [ -L $HOME/BirdNET-Pi/model/labels_flickr.txt ]; then
-  sudo_with_user ln -sf labels_nm/labels_en.txt $HOME/BirdNET-Pi/model/labels_flickr.txt
+if [ -L $HOME/BirdNET-Pi/model/labels_flickr.txt ]; then
+  rm $HOME/BirdNET-Pi/model/labels_flickr.txt
 fi
-if ! [ -L $HOME/BirdNET-Pi/model/labels.txt ]; then
+if [ -L $HOME/BirdNET-Pi/model/labels.txt ]; then
   sudo_with_user install_language_label.sh
 fi
 

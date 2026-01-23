@@ -10,7 +10,7 @@ import gzip
 import io
 import soundfile
 from typing import Any, Dict, List, Optional
-from .helpers import Detection
+from .classes import Detection
 
 log = logging.getLogger(__name__)
 

@@ -28,6 +28,7 @@ $db->busyTimeout(1000);
 $statement1 = $db->prepare('SELECT Sci_Name, Com_Name, COUNT(*) FROM detections WHERE Date BETWEEN "' . date("Y-m-d", $startdate) . '" AND "' . date("Y-m-d", $enddate) . '" GROUP By Sci_Name ORDER BY COUNT(*) DESC');
 ensure_db_ok($statement1);
 $result1 = $statement1->execute();
+$detections = [];
 while ($detection = $result1->fetchArray(SQLITE3_ASSOC)) {
   $com_name = $detection["Com_Name"];
   $sci_name = $detection["Sci_Name"];

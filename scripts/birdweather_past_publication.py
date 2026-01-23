@@ -10,7 +10,8 @@ import warnings
 import librosa
 import pandas as pd
 from tzlocal import get_localzone
-from utils.helpers import DB_PATH, get_settings, setup_logging, Detection
+from utils.classes import Detection
+from utils.helpers import DB_PATH, get_settings, setup_logging
 from utils.birdweather import (
     get_birdweather_species_id,
     query_birdweather_detections,
@@ -139,7 +140,8 @@ def main():
             detection = Detection(
                 detection_datetime,
                 detection_datetime + datetime.timedelta(seconds=soundscape_duration),
-                f"{detection_entry.Sci_Name}_{detection_entry.Com_Name}",
+                detection_entry.Sci_Name,
+                detection_entry.Com_Name,
                 detection_entry.Confidence,
             )
             try:
